@@ -1,6 +1,6 @@
+import App from "./App.tsx";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <h1>Hello World!</h1>
-  </div>
-`
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new App(document.getElementById('app')!);
+    app.render();
+})
