@@ -16,15 +16,28 @@ Handlebars.registerPartial('Button', Button);
 Handlebars.registerPartial('ButtonDark', ButtonDark);
 Handlebars.registerPartial('ChatItem', ChatItem);
 
+const pages = ['login','signup','chats','profileMain','profileEdit','profileEditPassword','500','404'];
+
 export default class App{
     private state: { currentPage: string };
     private rootElement: HTMLElement;
 
     constructor(rootElement: HTMLElement) {
         this.state = {
-            currentPage:'signup'
+            currentPage:'login'
         }
         this.rootElement = rootElement;
+        document.addEventListener('keyup', (e)=>{
+            if (e.code === 'Space' || e.code === 'ArrowRight') {
+                const current = pages.indexOf(this.state.currentPage);
+                let next = pages[current+1];
+                if (current>=pages.length-1){
+                    next = pages[0];
+                }
+                this.state.currentPage = next;
+                this.render();
+            }
+        });
     }
 
     render(){
