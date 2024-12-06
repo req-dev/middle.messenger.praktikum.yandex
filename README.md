@@ -30,4 +30,3 @@
 * [Handlebars](https://handlebarsjs.com/guide/#what-is-handlebars)
 * [Vite](https://vite.dev/)
 * [PostCSS](https://postcss.org/)
-* 
