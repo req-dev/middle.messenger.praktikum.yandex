@@ -1,0 +1,93 @@
+.chat-item{
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+    padding: 12px 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+    -webkit-user-select: none;
+    /* added additional border to first element in class .chats-page__sidebar-chats-list (chats page) */
+}
+.chat-item:hover{
+    filter: brightness(93%);
+}
+.chat-item:active{
+    filter: brightness(78%);
+}
+.chat-item__body{
+    width: 100%;
+}
+.chat-item__img{
+    width: 47px;
+    height: 47px;
+    border-radius: 100%;
+    margin-right: 10px;
+    background-color: var(--color-non-accent-text);
+}
+
+/* top area of the body */
+.chat-item__body-top{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.chat-item__body-top-name{
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 100%;
+    color: #fff;
+    margin-bottom: 7px;
+}
+.chat-item__body-top-datestamp{
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 100%;
+    color: var(--color-non-accent-text);
+}
+
+/* bottom area of the body */
+.chat-item__body-bottom{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.chat-item__body-bottom-message{
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 100%;
+    color: var(--color-non-accent-text);
+    display: -webkit-box;
+    display: -moz-box;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.chat-item__body-bottom-message-prefix{
+    color: #fff;
+}
+.chat-item__body-bottom-counter{
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 100%;
+    align-self: end;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
