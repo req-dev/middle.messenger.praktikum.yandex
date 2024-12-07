@@ -6,8 +6,4 @@
 # “publish” is the directory to publish (relative to the root of your repo).
 
 [build]
-<<<<<<< HEAD
-  publish = "dist"
-=======
-  publish = "dist"
->>>>>>> sprint_1
+publish = "dist"
