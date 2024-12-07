@@ -16,11 +16,19 @@
 
 Общение с друзьями, коллегами, знакомство с новыми людьми - все это позволяет вам сделать "Чат". Вы можете создавать группы с неограниченным количеством участников! **Ограничений на темы обсуждения нет**. Мы не модерируем и не цензурируем чаты (потому что у нас нет на это денег)
 
-[Ссылка на Netlify](https://yp-messr.netlify.app/)
+[Ссылка на Netlify](https://yp-messr.netlify.app/chats)
 
-### Навигация по страницам приложения
+### Страницы приложения
 
-В приложении реализован роутинг для навигации по страницам при `нажатии стралки вверх` или `кнопки пробела`
+* [/login](https://yp-messr.netlify.app/login)
+* [/signup](https://yp-messr.netlify.app/signup)
+* [/chats](https://yp-messr.netlify.app/chats)
+* [/profileMain](https://yp-messr.netlify.app/profileMain)
+* [/profileEdit](https://yp-messr.netlify.app/profileEdit)
+* [/500](https://yp-messr.netlify.app/500)
+* [/404](https://yp-messr.netlify.app/404)
+
+Также в приложении реализован роутинг для навигации по страницам при `нажатии стрелки вверх` или `кнопки пробела`
 
 ### Установка
 
