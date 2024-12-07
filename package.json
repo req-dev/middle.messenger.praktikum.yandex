@@ -10,7 +10,7 @@
     "dev": "vite --port 3000",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "start": "tsc && vite build && serve -s dist"
+    "start": "tsc && vite build && vite preview --port 3000"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "esbuild": "^0.17.19",
-    "handlebars": "^4.7.8",
-    "serve": "^14.2.4"
+    "handlebars": "^4.7.8"
   }
 }

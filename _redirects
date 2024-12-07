@@ -1,8 +1,0 @@
-/login /index.html 200
-/signup /index.html 200
-/chats /index.html 200
-/profileMain /index.html 200
-/profileEdit /index.html 200
-/profileEditPassword /index.html 200
-/500 /index.html 200
-/404 /index.html 200
