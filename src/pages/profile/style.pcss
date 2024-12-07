@@ -102,7 +102,8 @@
 .profile-page__body-card_actions{
     grid-template-columns: 1fr;
 }
-.profile-page__body-card > div,
+.profile-page__body-card > button,
+.profile-page__body-card > label,
 .profile-page__body-card > input {
     padding: 10px 0;
     border-bottom: 1px solid var(--color-border);
@@ -116,6 +117,10 @@
 }
 .profile-page__body-card-item-property_btn{
     cursor: pointer;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    text-align: left;
 }
 .profile-page__body-card-item-property_btn:hover{
     filter: brightness(93%);

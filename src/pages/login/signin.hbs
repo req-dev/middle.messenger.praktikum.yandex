@@ -2,8 +2,8 @@
     <div class="login-page__modal">
         {{> ModalTitle title="Log in"}}
         <form class="login-page__form">
-            {{> Input type="text" name="login" placeholder="ivanivanov" hint="Login" errorText="The login is wrong" }}
-            {{> Input type="password" name="password" placeholder="••••••••••••" hint="Password" }}
+            {{> Input type="text" name="login" placeholder="ivanivanov" hint="Login" errorText="The login is wrong" id="loginInput" }}
+            {{> Input type="password" name="password" placeholder="••••••••••••" hint="Password" id="passwordInput" }}
         </form>
         <div class="login-page__modal-space"></div>
         {{> Button id="signinBtn" text="Sign in" }}

@@ -24,7 +24,7 @@ export default class App{
 
     constructor(rootElement: HTMLElement) {
         this.state = {
-            currentPage:'login'
+            currentPage:document.location.pathname.replace('/','')
         }
         this.rootElement = rootElement;
         document.addEventListener('keyup', (e)=>{
@@ -35,6 +35,7 @@ export default class App{
                     next = pages[0];
                 }
                 this.state.currentPage = next;
+                history.pushState(null,'', next);
                 this.render();
             }
         });

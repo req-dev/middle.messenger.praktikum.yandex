@@ -1,7 +1,7 @@
 //language=hbs
 import './style.pcss';
 const ChatItem = `<div class="chat-item">
-    <img src="{{src}}" class="chat-item__img" alt="">
+    <img src="{{src}}" class="chat-item__img" alt="{{name}} avatar">
     <div class="chat-item__body">
         <div class="chat-item__body-top">
             <div class="chat-item__body-top-name">{{name}}</div>

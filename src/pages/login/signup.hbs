@@ -2,13 +2,13 @@
     <div class="login-page__modal">
         {{> ModalTitle title="Create an Account"}}
         <form class="login-page__form">
-            {{> Input type="email" name="email" placeholder="pochta@yandex.ru" hint="E-mail" }}
-            {{> Input type="text" name="login" placeholder="ivanivanov" hint="Login" errorText="The login is wrong" }}
-            {{> Input type="text" name="first_name" placeholder="ivan" hint="First name" }}
-            {{> Input type="text" name="second_name" placeholder="ivanov" hint="Second name" }}
-            {{> Input type="text" name="phone" placeholder="+7 (909) 967 30 30" hint="Phone" }}
-            {{> Input type="password" name="password" placeholder="••••••••••••" hint="Password" }}
-            {{> Input type="password_repeat" name="password" placeholder="•••••••••••" hint="Password again" errorText="Passwords do not match" }}
+            {{> Input type="email" name="email" placeholder="pochta@yandex.ru" hint="E-mail" id="emailInput" }}
+            {{> Input type="text" name="login" placeholder="ivanivanov" hint="Login" errorText="The login is wrong" id="loginInput" }}
+            {{> Input type="text" name="first_name" placeholder="ivan" hint="First name" id="firstNameInput" }}
+            {{> Input type="text" name="second_name" placeholder="ivanov" hint="Second name" id="secondNameInput" }}
+            {{> Input type="text" name="phone" placeholder="+7 (909) 967 30 30" hint="Phone" id="phoneInput" }}
+            {{> Input type="password" name="password" placeholder="••••••••••••" hint="Password" id="passwordInput" }}
+            {{> Input type="password_repeat" name="password" placeholder="•••••••••••" hint="Password again" errorText="Passwords do not match" id="passwordAgainInput" }}
         </form>
         <div class="login-page__modal-space login-page__modal-space_signup"></div>
         {{> Button id="signinBtn" text="Create account" }}

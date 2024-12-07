@@ -1,3 +1,4 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/46ae13a3-e441-4655-8046-059d65facb24/deploy-status)](https://app.netlify.com/sites/yp-messr/deploys)
 # Веб приложение "Чат"
 
 "Чат" это быстрое и оптимизированное SPA-приложение для общения с друзьями:
