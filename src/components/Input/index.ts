@@ -1,5 +1,5 @@
 // language=hbs
-import './style.pcss';
+import './Input.pcss';
 
 const Input = `<div class="input">
     <label for="{{id}}" class="input__hint">{{hint}}</label>

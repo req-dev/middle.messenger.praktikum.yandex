@@ -1,5 +1,5 @@
 // language=hbs
-import './style.pcss';
+import './ChatItem.pcss';
 
 const ChatItem = `<div class="chat-item">
     <img src="{{src}}" class="chat-item__img" alt="{{name}} avatar">

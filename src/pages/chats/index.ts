@@ -1,4 +1,4 @@
-import './style.pcss';
-import chatsPage from './template.hbs?raw';
+import './Chats.pcss';
+import chatsPage from './Chats.hbs?raw';
 
 export default chatsPage;
