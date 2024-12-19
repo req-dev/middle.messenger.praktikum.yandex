@@ -1,4 +1,4 @@
 import './Error.pcss';
-import errorPageTemplate from './Error.hbs?raw';
+import ErrorPage from './Error';
 
-export default errorPageTemplate;
+export default ErrorPage;

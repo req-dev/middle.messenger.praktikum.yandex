@@ -1,18 +1,18 @@
 import Handlebars from 'handlebars';
 import { EventBus } from './EventBus';
 
-export interface props extends Record<string, unknown>{
-  className?: string,
+export interface blockProps extends Record<string, unknown>{
   child?: string,
   events?: Record<string, (...args) => void>,
-  attr?: Record<string, string>,
+  className?: string,
+  attr?: { class?: string, } & Record<string, string>,
   settings?: {
     withInternalID?: boolean
   }
   __id?: number
 }
 
-abstract class Block<T extends props> {
+abstract class Block<T extends blockProps> {
   static EVENTS = {
     INIT: 'init',
     FLOW_CDM: 'flow:component-did-mount',
@@ -30,7 +30,7 @@ abstract class Block<T extends props> {
 
   public eventBus: () => EventBus;
 
-  private children: Record<string, Block<T>>;
+  private children: Record<string, Block<T>> = {};
 
   protected constructor(tagName = 'div', propsAndChildren: T) {
     let { children, props } = this._getChildren(propsAndChildren);
@@ -67,7 +67,7 @@ abstract class Block<T extends props> {
 
   private _getChildren(propsAndChildren: T) {
     const children: Record<string, Block<T>> = {};
-    const props: props = {};
+    const props: blockProps = {};
 
     Object.entries(propsAndChildren).forEach(([key, value]) => {
       if (value instanceof Block) {
@@ -109,7 +109,7 @@ abstract class Block<T extends props> {
     });
   }
 
-  componentDidMount(oldProps?: props) {
+  componentDidMount(oldProps?: blockProps) {
     return true;
   }
 
@@ -129,8 +129,14 @@ abstract class Block<T extends props> {
   }
 
   addAttributes() {
-    const { attr } = this.props;
-    if (!attr) return;
+    const attr = this.props.attr || {};
+
+    if (this.props.className){
+      if (!attr.class){
+        attr.class = '';
+      }
+      attr.class += this.props.className;
+    }
 
     Object.entries(attr).forEach(([key, value]) => {
       this._element.setAttribute(key, value);

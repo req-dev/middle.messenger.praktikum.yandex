@@ -1,7 +1,9 @@
-export { default as errorPageTemplate } from './error';
+import ErrorPage from './error';
 
-export { loginPage, signupPage } from './login';
+export { ErrorPage };
 
-export { default as chatsPage } from './chats';
+export { SignInPage, SignUpPage } from './login';
+
+export { default as ChatsPage } from './chats';
 
 export { profileMain, profileEdit, profileEditPassword } from './profile';

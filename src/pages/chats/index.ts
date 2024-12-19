@@ -1,4 +1,4 @@
 import './Chats.pcss';
-import chatsPage from './Chats.hbs?raw';
+import ChatsPage from './Chats';
 
-export default chatsPage;
+export default ChatsPage;
