@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ES2020",
+    "module": "ESNext",
     "sourceMap": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -16,9 +16,9 @@
     }
   },
   "include": [
-    "src",
     "src/**/*.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    ".eslintrc.cjs"
   ],
   "exclude": ["node_modules", "dist", ".idea"]
 }
