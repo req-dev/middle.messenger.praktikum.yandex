@@ -13,6 +13,7 @@ export default class ErrorPage extends Block<ErrorPageProps> {
   constructor(props: ErrorPageProps) {
     super('div', {
       ...props,
+      className: 'error-page',
       ButtonS: new ButtonS({
         text: 'Back to Chats',
         events: {
@@ -22,13 +23,11 @@ export default class ErrorPage extends Block<ErrorPageProps> {
     });
   }
   render() {
-    return `<div class="error-page">
-    <div class="error-page__card">
+    return `<div class="error-page__card">
         <h1 class="error-page__code">{{code}}</h1>
         <h2 class="error-page__code-desc">{{codeDesc}}</h2>
         <h3 class="error-page__message">{{message}}</h3>
     </div>
-    {{{ButtonS}}}
-</div>`;
+    {{{ButtonS}}}`;
   }
 }

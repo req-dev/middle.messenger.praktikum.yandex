@@ -101,64 +101,71 @@
     background-color: var(--color-near-bkg);
     border-radius: 15px;
     box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     padding: 5px 15px;
     width: 540px;
-}
-
-.profile-page__body-card > *:last-child {
-    border-bottom: none;
-}
-
-.profile-page__body-card:not(.profile-page__body-card_actions) > *:nth-last-child(2) {
-    border-bottom: none;
 }
 
 .profile-page__body-card_actions{
     grid-template-columns: 1fr;
 }
 
-.profile-page__body-card > button,
-.profile-page__body-card > label,
-.profile-page__body-card > input {
+.profile-page__body-card-item-property{
+    width: 100%;
+    display: flex;
     border-bottom: 1px solid var(--color-border);
     padding: 10px 0;
 }
 
-.profile-page__body-card-item-property{
+.profile-page__body-card-item-property:last-child {
+    border-bottom: none;
+}
+
+.profile-page__body-card-item-property-label{
     color: var(--color-non-accent-text);
     font-family: Inter, sans-serif;
     font-size: 13px;
     font-weight: 500;
     line-height: 100%;
+    width: 50%;
 }
 
-.profile-page__body-card-item-property_btn{
+.profile-page__body-card-item-property-btn{
     background-color: transparent;
     border: none;
     cursor: pointer;
     outline: none;
     text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 0;
 }
 
-.profile-page__body-card-item-property_btn:hover{
+.profile-page__body-card-item-property-btn:last-child {
+    border-bottom: none;
+}
+
+.profile-page__body-card-item-property-btn:last-child {
+    border-bottom: none;
+}
+
+.profile-page__body-card-item-property-btn:hover{
     filter: brightness(93%);
 }
 
-.profile-page__body-card-item-property_btn:active{
+.profile-page__body-card-item-property-btn:active{
     filter: brightness(70%);
 }
 
-.profile-page__body-card-item-property_green{
+.profile-page__body-card-item-property-btn_green{
     color: var(--color-accent);
 }
 
-.profile-page__body-card-item-property_red{
+.profile-page__body-card-item-property-btn_red{
     color: var(--color-red);
 }
 
-.profile-page__body-card-item-property-value{
+.profile-page__body-card-item-property-input{
     background: transparent;
     border: none;
     color: #fff;
@@ -168,6 +175,7 @@
     line-height: 100%;
     outline: none;
     text-align: end;
+    width: 50%;
 }
 
 .page__body-space-between-cards{

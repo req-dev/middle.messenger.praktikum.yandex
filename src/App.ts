@@ -1,12 +1,14 @@
 import * as Pages from './pages';
 import '../global.pcss';
+import Block from './framework/Block';
 
 const pages = [
-  'login', 'signup', 'chats', 'profileMain', 'profileEdit', 'profileEditPassword', '500', '404',
+  'login', 'signup', 'chats', 'profileMain', '500', '404',
 ];
 
 export default class App {
   private state: { currentPage: string };
+  private pageBlock?: Block;
 
   private rootElement: HTMLElement;
 
@@ -30,28 +32,21 @@ export default class App {
   }
 
   render(subject: string) {
-    let page;
     switch (subject) {
       case 'login':
-        page = new Pages.SignInPage();
+        this.pageBlock = new Pages.SignInPage();
         break;
       case 'signup':
-        page = new Pages.SignUpPage();
+        this.pageBlock = new Pages.SignUpPage();
         break;
       case 'chats':
-        page = new Pages.ChatsPage();
+        this.pageBlock = new Pages.ChatsPage();
         break;
       case 'profileMain':
-        page = Pages.profileMain;
-        break;
-      case 'profileEdit':
-        page = Pages.profileEdit;
-        break;
-      case 'profileEditPassword':
-        page = Pages.profileEditPassword;
+        this.pageBlock = new Pages.ProfilePage();
         break;
       case '500':
-        page = new Pages.ErrorPage({
+        this.pageBlock = new Pages.ErrorPage({
           code: '500',
           codeDesc: 'Internal Server Error',
           message: 'We are already working on it',
@@ -59,13 +54,18 @@ export default class App {
         });
         break;
       default:
-        page = new Pages.ErrorPage({
+        this.pageBlock = new Pages.ErrorPage({
           code: '404',
           codeDesc: 'Not Found',
           message: 'It seems like you lost',
           toMainPage: () => this.render('chats')
         });
     }
-    this.rootElement.replaceWith(page.getContent());
+
+    if (!this.rootElement.firstChild){
+      this.rootElement.appendChild(document.createElement('div'));
+    }
+    this.rootElement.firstChild.replaceWith(this.pageBlock.getContent());
+    this.pageBlock.dispatchComponentDidMount();
   }
 }

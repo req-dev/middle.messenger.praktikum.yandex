@@ -7,7 +7,7 @@ interface ChatItemProps extends blockProps {
   datestamp: string,
   message: string,
   addMePrefix?: boolean
-  counter: number
+  counter?: number
 }
 
 export default class ChatItem extends Block<ChatItemProps>{

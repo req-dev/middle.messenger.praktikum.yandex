@@ -1,14 +1,97 @@
 import Block, { blockProps } from '../../framework/Block';
+import ChatItem from '../../components/ChatItem';
 
 interface ChatsPageProps extends blockProps{
 
 }
+
+const mockData = {
+  chatsList: [
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Lucy Shtein',
+      message: 'Hey there! Wanna make some money? Of course you do! Then come to our party with Tim Cook',
+      datestamp: '10:49',
+      counter: 1
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Bro',
+      message: 'Also, the Weekend just dropped a new song, You gotta check it out!',
+      datestamp: '10:13',
+      counter: 4
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Andrew',
+      message: 'Thanks',
+      datestamp: '09:22',
+      counter: 0,
+      addMePrefix: true
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Design Destroyer',
+      message: 'Guys I have an idea about out last project! We can paint the logo blue and add some minor changes',
+      datestamp: '09:01',
+      counter: 0,
+      addMePrefix: true
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Medial Care bot',
+      message: 'Reminder: You have an appointment at 17 p.m.',
+      datestamp: 'Yesterday',
+      counter: 9,
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'CIA Agent',
+      message: 'Yes, I did',
+      datestamp: 'Yesterday',
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Maria',
+      message: 'Ok, take your time.',
+      datestamp: 'Yesterday',
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Ben',
+      message: 'Sorry, I forgot!',
+      datestamp: 'Yesterday',
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Marinette',
+      message: 'Sticker',
+      datestamp: '22 sep',
+      addMePrefix: true
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Oliver',
+      message: 'I will call you',
+      datestamp: '21 sep',
+      addMePrefix: true
+    }),
+    new ChatItem({
+      src: 'https://avatar.iran.liara.run/public',
+      name: 'Oscar',
+      message: 'Can you lend me some money?',
+      datestamp: '21 sep',
+      counter: 44,
+    }),
+  ]
+};
 
 export default class ChatsPage extends Block<ChatsPageProps> {
   constructor(props?: ChatsPageProps) {
     super('div', {
       ...props,
       className: 'chats-page',
+      childrenList: { ...mockData }
     });
   }
   render() {
@@ -21,81 +104,7 @@ export default class ChatsPage extends Block<ChatsPageProps> {
             <input type="text" placeholder="Search" class="chats-page__sidebar-header-search">
         </div>
         <div class="chats-page__sidebar-chats-list">
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Lucy Shtein"
-                    message="Hey there! Wanna make some money? Of course you do! Then come to our party with Tim Cook"
-                    datestamp="10:49"
-                    counter="1"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Bro"
-                    message="Also, the Weekend just dropped a new song, You gotta check it out!"
-                    datestamp="10:13"
-                    counter="4"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Andrew"
-                    addMePrefix="true"
-                    message="Thanks"
-                    datestamp="09:22"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Design Destroyer"
-                    addMePrefix="true"
-                    message="Guys I have an idea about out last project! We can paint the logo blue and add some minor changes"
-                    datestamp="09:01"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Medial Care bot"
-                    message="Reminder: You have an appointment at 17 p.m."
-                    datestamp="Yesterday"
-                    counter="9"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="CIA Agent"
-                    addMePrefix="true"
-                    message="Yes, I did"
-                    datestamp="Yesterday"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Maria"
-                    message="Ok, take your time."
-                    datestamp="Yesterday"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Ben"
-                    message="Sorry, I forgot!"
-                    datestamp="Yesterday"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Marinette"
-                    addMePrefix="true"
-                    message="Sticker"
-                    datestamp="22 sep"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Oliver"
-                    addMePrefix="true"
-                    message="I will call you"
-                    datestamp="21 sep"
-            }}
-            {{> ChatItem
-                    src="https://avatar.iran.liara.run/public"
-                    name="Oscar"
-                    message="Can you lend me some money?"
-                    datestamp="21 sep"
-                    counter="44"
-            }}
+            {{{chatsList}}}
         </div>
     </div>
     <div class="chats-page__dialog-area">

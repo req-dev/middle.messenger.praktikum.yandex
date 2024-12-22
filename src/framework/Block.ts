@@ -1,13 +1,15 @@
 import Handlebars from 'handlebars';
 import { EventBus } from './EventBus';
+import getRandomNumber from '../unitilies/getRandomNumber';
 
 export interface blockProps extends Record<string, unknown>{
-  child?: string,
+  childrenList?: Record<string, Block<blockProps>[]>,
   events?: Record<string, (...args) => void>,
   className?: string,
-  attr?: { class?: string, } & Record<string, string>,
+  attr?: { class?: string, listid?: string, belongsToList?: string } & Record<string, string>,
   settings?: {
-    withInternalID?: boolean
+    withInternalID?: boolean,
+    targetElementForEvents?: string
   }
   __id?: number
 }
@@ -17,36 +19,29 @@ abstract class Block<T extends blockProps> {
     INIT: 'init',
     FLOW_CDM: 'flow:component-did-mount',
     FLOW_CDU: 'flow:component-did-update',
+    FLOW_CWU: 'flow:component-will-unmount',
     FLOW_RENDER: 'flow:render',
   };
 
   private _element: HTMLElement;
-
   private _meta = null;
-
-  private _id = Math.ceil(Math.random()*1420503132 + Math.random()*120462132);
-
+  private _id = getRandomNumber();
   public props: T;
-
   public eventBus: () => EventBus;
-
-  private children: Record<string, Block<T>> = {};
+  protected children: Record<string, Block<T>> = {};
 
   protected constructor(tagName = 'div', propsAndChildren: T) {
     let { children, props } = this._getChildren(propsAndChildren);
     const eventBus = new EventBus();
 
     this.children = children;
-
     props = { ...props, __id: this._id };
-
     this._meta = {
       tagName,
       props,
     };
 
     this.props = this._makePropsProxy({ ...props });
-
     this.eventBus = () => eventBus;
 
     this._registerEvents(eventBus);
@@ -57,6 +52,7 @@ abstract class Block<T extends blockProps> {
     eventBus.on(Block.EVENTS.INIT, this._init.bind(this));
     eventBus.on(Block.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
     eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
+    eventBus.on(Block.EVENTS.FLOW_CWU, this._componentWillUnmount.bind(this));
     eventBus.on(Block.EVENTS.FLOW_RENDER, this._render.bind(this));
   }
 
@@ -69,13 +65,26 @@ abstract class Block<T extends blockProps> {
     const children: Record<string, Block<T>> = {};
     const props: blockProps = {};
 
-    Object.entries(propsAndChildren).forEach(([key, value]) => {
+    // childrenList is array of blocks with any length
+    // They must be named differently {sectionName}__{randomId}
+    // They will be inserted into HTML to {sectionName} area
+    if (propsAndChildren.childrenList) {
+      for (const [key, blocks] of Object.entries(propsAndChildren.childrenList)) {
+        for (const child: Block<T> of blocks) {
+          const id = `${key}__${getRandomNumber()}`;
+          children[id] = child;
+        }
+      }
+    }
+
+    // looking for regular blocks
+    for (const [key, value] of Object.entries(propsAndChildren)) {
       if (value instanceof Block) {
         children[key] = value as Block<T>;
       } else {
         props[key] = value;
       }
-    });
+    }
 
     return { children, props };
   }
@@ -89,7 +98,7 @@ abstract class Block<T extends blockProps> {
     const { events = {} } = this.props;
 
     Object.keys(events).forEach((eventName) => {
-      this._element.addEventListener(eventName, events[eventName]);
+      this.targetElement?.addEventListener(eventName, events[eventName]);
     });
   }
 
@@ -97,7 +106,7 @@ abstract class Block<T extends blockProps> {
     const { events = {} } = this.props;
 
     Object.keys(events).forEach((eventName) => {
-      this._element.removeEventListener(eventName, events[eventName]);
+      this.targetElement?.removeEventListener(eventName, events[eventName]);
     });
   }
 
@@ -109,33 +118,43 @@ abstract class Block<T extends blockProps> {
     });
   }
 
-  componentDidMount(oldProps?: blockProps) {
-    return true;
-  }
+  // user can override it
+  componentDidMount(): void { }
 
   dispatchComponentDidMount() {
     this.eventBus().emit(Block.EVENTS.FLOW_CDM);
   }
 
-  private _componentDidUpdate() {
-    const needRerender = this.componentDidUpdate();
+  private _componentWillUnmount() {
+    this._removeEvents();
+    this.componentWillUnmount();
+  }
+
+  // user can override it
+  componentWillUnmount(): void { }
+
+  private _componentDidUpdate(oldProps?: T) {
+    const needRerender = this.componentDidUpdate(oldProps);
     if (needRerender) {
+      this.eventBus().emit(Block.EVENTS.FLOW_CWU);
       this._render();
     }
   }
 
-  componentDidUpdate(): boolean {
-    return true;
-  }
+  // user can override it
+  // if it returns true, block will rerender
+  componentDidUpdate(oldProps?: T): boolean { return true; }
 
-  addAttributes() {
+  protected addAttributes() {
     const attr = this.props.attr || {};
 
     if (this.props.className){
+      // merging both className and attr.class if defined
       if (!attr.class){
-        attr.class = '';
+        attr.class = this.props.className;
+      }else {
+        attr.class += ` ${this.props.className}`;
       }
-      attr.class += this.props.className;
     }
 
     Object.entries(attr).forEach(([key, value]) => {
@@ -143,7 +162,7 @@ abstract class Block<T extends blockProps> {
     });
   }
 
-  setProps = (nextProps) => {
+  setProps = (nextProps: T) => {
     if (!nextProps) {
       return;
     }
@@ -154,42 +173,70 @@ abstract class Block<T extends blockProps> {
     return this._element;
   }
 
+  get targetElement() {
+    const { settings } = this.props
+    return settings?.targetElementForEvents ?
+      this._element.querySelector(settings.targetElementForEvents) : this._element;
+  }
+
   private _render() {
-    const propsAndStubs = { ...this.props };
+    const additionalBlocks: Record<string, Block<T>[]> = {}; // blocks from childrenList array will be here
+    const propsAndStubs = { ...this.props }; // rest of the props
 
-    Object.entries(this.children).forEach(([key, child]) => {
+    for (const [key, child] of Object.entries(this.children)) {
+      const [prefix] = key.split('__');
+      // blocks from childrenList have key separated with __
+      // it's the way to divide them from regular children
+      if (key.includes('__')) {
+        if (!additionalBlocks[prefix]) {
+          additionalBlocks[prefix] = [];
+        }
+        additionalBlocks[prefix].push(child);
+      }
       propsAndStubs[key] = `<div data-id="${child._id}"></div>`;
+    }
+
+    // prepare blocks from childrenList to be inserted to HTML differently
+    const additionalHtml: Record<string, string> = {};
+    for (const [key, blocks] of Object.entries(additionalBlocks)) {
+      additionalHtml[key] = blocks
+        .map(block => `<div data-id="${block._id}"></div>`)
+        .join('');
+    }
+
+    // render template with additional blocks from childrenList
+    const template = this._createDocumentElement('template') as HTMLTemplateElement;
+    template.innerHTML = Handlebars.compile(this.render())({
+      ...propsAndStubs,
+      ...additionalHtml,
     });
 
-    const fragment = this._createDocumentElement('template') as HTMLTemplateElement;
+    for (const child of Object.values(this.children)) {
+      const placeholder = template.content.querySelector(`[data-id="${child._id}"]`);
+      placeholder?.replaceWith(child.getContent());
+    }
 
-    fragment.innerHTML = Handlebars.compile(this.render())(propsAndStubs);
-
-    Object.values(this.children).forEach((child) => {
-      const stub = fragment.content.querySelector(`[data-id="${child._id}"]`);
-      stub.replaceWith(child.getContent());
-    });
-
-    const block = fragment.content;
     this._removeEvents();
-    this._element.innerHTML = ''; // deleting the previous HTML
-    this._element.appendChild(block);
+    this._element.innerHTML = ''; // Clear previous HTML
+    this._element.appendChild(template.content);
     this._addEvents();
     this.addAttributes();
   }
 
+  // user have to override it
   abstract render(): string
 
   getContent() {
     return this.element;
   }
 
-  _makePropsProxy(props: T) {
+  private _makePropsProxy(props: T) {
     const context = this;
     return new Proxy(props, {
       set(target, key, value) {
+        const oldProps = { ...target };
         target[key] = value;
-        context.eventBus().emit(Block.EVENTS.FLOW_CDU);
+        context.eventBus().emit(Block.EVENTS.FLOW_CDU, oldProps);
         return true;
       },
     });
@@ -198,7 +245,7 @@ abstract class Block<T extends blockProps> {
   private _createDocumentElement(tagName: string) {
     const element = document.createElement(tagName);
     if (this.props.settings?.withInternalID) {
-      element.setAttribute('data-id', this._id);
+      element.setAttribute('data-id', this._id.toString());
     }
     return element;
   }

@@ -3,6 +3,8 @@ import ModalTitle from '../../components/ModalTitle';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
+import { ValidateForm } from '../../unitilies/ValidateForm';
+
 interface SignUpProps extends blockProps{
   ModalTitle?: ModalTitle,
   EmailInput?: Input,
@@ -17,6 +19,8 @@ interface SignUpProps extends blockProps{
 }
 
 export default class SignUpPage extends Block<SignUpProps> {
+  protected ValidateForm: ValidateForm;
+
   constructor(props?: SignUpProps) {
     super('div', {
       ...props,
@@ -30,6 +34,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: 'pochta@yandex.ru',
         name: 'email',
         id: 'emailInput',
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
       LoginInput: new Input({
         hint: 'Login',
@@ -37,6 +44,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: 'ivanivanov',
         name: 'login',
         id: 'loginInput',
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
       FirstNameInput: new Input({
         hint: 'First name',
@@ -44,6 +54,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: 'ivan',
         name: 'first_name',
         id: 'firstNameInput',
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
       SecondNameInput: new Input({
         hint: 'Second name',
@@ -51,6 +64,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: 'ivanov',
         name: 'second_name',
         id: 'secondNameInput',
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
       PhoneInput: new Input({
         hint: 'Phone',
@@ -58,6 +74,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: '+7 (909) 967 30 30',
         name: 'phone',
         id: 'phoneInput',
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
       PasswordInput: new Input({
         hint: 'Password',
@@ -65,6 +84,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: '••••••••••••',
         name: 'password',
         id: 'passwordInput',
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
       PasswordAgainInput: new Input({
         hint: 'Password again',
@@ -72,7 +94,9 @@ export default class SignUpPage extends Block<SignUpProps> {
         placeholder: '•••••••••••',
         name: 'password_repeat',
         id: 'passwordAgainInput',
-        errorText: 'Passwords do not match'
+        events: {
+          blur: () => this.checkForm()
+        }
       }),
 
       SignInBtn: new Button({
@@ -82,10 +106,29 @@ export default class SignUpPage extends Block<SignUpProps> {
       }),
       SignUpBtn: new Button({
         text: 'Create account',
-        attr: { id: 'signupBtn' }
+        attr: { id: 'signupBtn' },
+        events: {
+          click: () => {
+            this.sendForm();
+          }
+        }
       })
     });
+
+    this.ValidateForm = new ValidateForm(this.getContent().querySelector('form'), Object.values(this.children) as Input[]);
   }
+
+  checkForm(){
+    return this.ValidateForm.check();
+  }
+
+  sendForm(){
+    const checkResult = this.checkForm();
+    if (!checkResult.valid) return;
+
+    console.log(Object.fromEntries(checkResult.data.entries()));
+  }
+
   render() {
     return `<div class="login-page">
     <div class="login-page__modal">
@@ -100,8 +143,8 @@ export default class SignUpPage extends Block<SignUpProps> {
             {{{PasswordAgainInput}}}
         </form>
         <div class="login-page__modal-space login-page__modal-space_signup"></div>
-        {{{SignUpBtn}}}
         {{{SignInBtn}}}
+        {{{SignUpBtn}}}
     </div>
 </div>`;
   }

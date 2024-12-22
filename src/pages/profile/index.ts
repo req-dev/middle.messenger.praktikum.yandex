@@ -1,7 +1,5 @@
 // language=hbs
 import './Profile.pcss';
-import profileMain from './Profile.hbs?raw';
-import profileEdit from './EditProfile.hbs?raw';
-import profileEditPassword from './ProfileChangePassword.hbs?raw';
+import ProfilePage from './Profile';
 
-export { profileMain, profileEdit, profileEditPassword };
+export default ProfilePage;
