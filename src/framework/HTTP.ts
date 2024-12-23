@@ -92,11 +92,11 @@ class HTTP {
     });
   };
 
-  requestWithRetry = (url: string, options: IHTTPOptions = {}): Promise<XMLHttpRequest> => {
+  requestWithRetry = (url: string, options: { tries?: number } & IHTTPOptions = {}): Promise<XMLHttpRequest> => {
     const HTTP = HTTP();
     const { tries = 1 } = options;
 
-    function onError(err) {
+    function onError(err: Error) {
       const triesLeft = tries - 1;
       if (!triesLeft) {
         throw err;

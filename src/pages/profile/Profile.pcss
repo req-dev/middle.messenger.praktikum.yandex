@@ -6,9 +6,11 @@
 
 .profile-page__back-btn{
     background-color: var(--color-accent-element);
+    border: none;
     cursor: pointer;
     display: flex;
     height: 100vh;
+    outline: none;
     width: 65px;
 }
 
@@ -112,10 +114,12 @@
 }
 
 .profile-page__body-card-item-property{
-    width: 100%;
-    display: flex;
     border-bottom: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: row;
+    margin: 0;
     padding: 10px 0;
+    width: 100%;
 }
 
 .profile-page__body-card-item-property:last-child {
@@ -134,15 +138,11 @@
 .profile-page__body-card-item-property-btn{
     background-color: transparent;
     border: none;
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
     outline: none;
-    text-align: left;
-    border-bottom: 1px solid var(--color-border);
     padding: 10px 0;
-}
-
-.profile-page__body-card-item-property-btn:last-child {
-    border-bottom: none;
+    text-align: left;
 }
 
 .profile-page__body-card-item-property-btn:last-child {
@@ -176,6 +176,10 @@
     outline: none;
     text-align: end;
     width: 50%;
+}
+
+.profile-page__body-card-item-property-input_red{
+    color: var(--color-red);
 }
 
 .page__body-space-between-cards{

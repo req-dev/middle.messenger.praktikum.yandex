@@ -12,6 +12,7 @@ export default class ModalTitle extends Block<ModalTitleProps>{
       className: 'modal-title'
     });
   }
+
   render() {
     return `{{text}}`;
   }

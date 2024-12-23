@@ -64,7 +64,6 @@ export default class SignInPage extends Block<SignInProps> {
     this.form = this.children['form'] as Form;
 
     this.form.setProps({
-      ...this.form.props,
       onSubmit: this.submitted
     });
   }

@@ -3,7 +3,7 @@ import '../global.pcss';
 import Block from './framework/Block';
 
 const pages = [
-  'login', 'signup', 'chats', 'profileMain', '500', '404',
+  'login', 'signup', 'chats', 'profile', '500', '404',
 ];
 
 export default class App {
@@ -42,8 +42,11 @@ export default class App {
       case 'chats':
         this.pageBlock = new Pages.ChatsPage();
         break;
-      case 'profileMain':
-        this.pageBlock = new Pages.ProfilePage();
+      case 'profile':
+        this.pageBlock = new Pages.ProfilePage({
+          editingPasswordMode: false,
+          editingMode: false
+        });
         break;
       case '500':
         this.pageBlock = new Pages.ErrorPage({
@@ -63,9 +66,10 @@ export default class App {
     }
 
     if (!this.rootElement.firstChild){
-      this.rootElement.appendChild(document.createElement('div'));
+      this.rootElement.appendChild(this.pageBlock.getContent());
+    }else {
+      this.rootElement.firstChild.replaceWith(this.pageBlock.getContent());
     }
-    this.rootElement.firstChild.replaceWith(this.pageBlock.getContent());
     this.pageBlock.dispatchComponentDidMount();
   }
 }

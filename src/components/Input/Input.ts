@@ -1,8 +1,8 @@
 // language=hbs
 import Block, {blockProps} from '../../framework/Block';
 
-interface InputProps extends blockProps {
-  hint: string,
+export interface InputProps extends blockProps {
+  hint?: string,
   type: 'text' | 'password' | 'email' | 'tel',
   placeholder: string,
   name: string,
@@ -11,7 +11,8 @@ interface InputProps extends blockProps {
   value?: string,
 }
 
-export default class Input extends Block<InputProps>{
+
+export class Input extends Block<InputProps>{
   constructor(props: InputProps) {
     super('div', {
       ...props,
@@ -25,24 +26,27 @@ export default class Input extends Block<InputProps>{
       },
       events: {
         ...props.events,
-        change: (e: Event) => {
-          this.props.value = e.target.value;
+        change: (e: InputEvent) => {
+          const target = (e.target as HTMLInputElement);
+          this.props.value = target.value;
         },
       }
     });
   }
 
-  componentDidUpdate(oldProps?: InputProps): boolean {
+  componentDidUpdate(oldProps: InputProps): boolean {
     // TODO review
     // block will rerender only if error text changes
-    const oldEventsLenght = Object.keys(oldProps!.events).length;
-    const eventsLenght = Object.keys(this.props!.events).length;
-    return oldProps?.errorText != this.props?.errorText || oldEventsLenght !== eventsLenght;
+    const oldEventsLength = Object.keys(oldProps.events).length;
+    const eventsLength = Object.keys(this.props.events).length;
+    return oldProps?.errorText != this.props?.errorText || oldEventsLength !== eventsLength;
   }
 
   render() {
     return `
-    <label for="{{id}}" class="input__hint">{{hint}}</label>
+    {{#if hint}}
+        <label for="{{id}}" class="input__hint">{{hint}}</label>
+    {{/if}}
     <input type="{{type}}"
            placeholder="{{placeholder}}"
            name="{{name}}"

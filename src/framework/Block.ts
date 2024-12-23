@@ -3,8 +3,8 @@ import { EventBus } from './EventBus';
 import getRandomNumber from '../unitilies/getRandomNumber';
 
 export interface blockProps extends Record<string, unknown>{
-  childrenList?: Record<string, Block<blockProps>[]>,
-  events?: Record<string, (...args) => void>,
+  childrenList?: Record<string, Block[]>,
+  events?: Record<string, (...args: unknown[]) => void>,
   className?: string,
   attr?: { class?: string, listid?: string, belongsToList?: string } & Record<string, string>,
   settings?: {
@@ -14,7 +14,7 @@ export interface blockProps extends Record<string, unknown>{
   __id?: number
 }
 
-abstract class Block<T extends blockProps> {
+abstract class Block<T extends blockProps = blockProps> {
   static EVENTS = {
     INIT: 'init',
     FLOW_CDM: 'flow:component-did-mount',
@@ -24,24 +24,26 @@ abstract class Block<T extends blockProps> {
   };
 
   private _element: HTMLElement;
-  private _meta = null;
+  private readonly _meta: { tagName: string, props: blockProps };
   private _id = getRandomNumber();
   public props: T;
   public eventBus: () => EventBus;
   protected children: Record<string, Block<T>> = {};
 
   protected constructor(tagName = 'div', propsAndChildren: T) {
-    let { children, props } = this._getChildren(propsAndChildren);
+    const getChildren = this._getChildren(propsAndChildren);
+    const { children } = getChildren;
+    let { props } = getChildren;
     const eventBus = new EventBus();
-
     this.children = children;
+
     props = { ...props, __id: this._id };
     this._meta = {
       tagName,
       props,
     };
-
     this.props = this._makePropsProxy({ ...props });
+
     this.eventBus = () => eventBus;
 
     this._registerEvents(eventBus);
@@ -65,14 +67,14 @@ abstract class Block<T extends blockProps> {
     const children: Record<string, Block<T>> = {};
     const props: blockProps = {};
 
-    // childrenList is array of blocks with any length
+    // childrenList is an array of blocks with any length
     // They must be named differently {sectionName}__{randomId}
     // They will be inserted into HTML to {sectionName} area
     if (propsAndChildren.childrenList) {
       for (const [key, blocks] of Object.entries(propsAndChildren.childrenList)) {
-        for (const child: Block<T> of blocks) {
+        for (const child of blocks) {
           const id = `${key}__${getRandomNumber()}`;
-          children[id] = child;
+          children[id] = child as Block<T>;
         }
       }
     }
@@ -133,7 +135,7 @@ abstract class Block<T extends blockProps> {
   // user can override it
   componentWillUnmount(): void { }
 
-  private _componentDidUpdate(oldProps?: T) {
+  private _componentDidUpdate(oldProps: T) {
     const needRerender = this.componentDidUpdate(oldProps);
     if (needRerender) {
       this.eventBus().emit(Block.EVENTS.FLOW_CWU);
@@ -143,12 +145,13 @@ abstract class Block<T extends blockProps> {
 
   // user can override it
   // if it returns true, block will rerender
-  componentDidUpdate(oldProps?: T): boolean { return true; }
+  // I disabled this rule so auto-complete can work and user will see the reference with args
+  componentDidUpdate(oldProps: T): boolean { return true; }
 
   protected addAttributes() {
     const attr = this.props.attr || {};
 
-    if (this.props.className){
+    if (this.props.className && !attr.class?.includes(this.props.className)){
       // merging both className and attr.class if defined
       if (!attr.class){
         attr.class = this.props.className;
@@ -162,21 +165,27 @@ abstract class Block<T extends blockProps> {
     });
   }
 
-  setProps = (nextProps: T) => {
+  protected removeAttributes() {
+    while (this._element.attributes.length > 0) {
+      this._element.removeAttribute(this._element.attributes[0].name);
+    }
+  }
+
+  setProps = (nextProps: blockProps) => {
     if (!nextProps) {
       return;
     }
     Object.assign(this.props, nextProps);
   };
 
-  get element() {
+  get element(): HTMLElement {
     return this._element;
   }
 
-  get targetElement() {
+  get targetElement(): HTMLElement {
     const { settings } = this.props
     return settings?.targetElementForEvents ?
-      this._element.querySelector(settings.targetElementForEvents) : this._element;
+      this._element.querySelector(settings.targetElementForEvents)! as HTMLElement : this._element;
   }
 
   private _render() {
@@ -220,6 +229,7 @@ abstract class Block<T extends blockProps> {
     this._element.innerHTML = ''; // Clear previous HTML
     this._element.appendChild(template.content);
     this._addEvents();
+    this.removeAttributes();
     this.addAttributes();
   }
 
@@ -231,12 +241,11 @@ abstract class Block<T extends blockProps> {
   }
 
   private _makePropsProxy(props: T) {
-    const context = this;
     return new Proxy(props, {
-      set(target, key, value) {
+      set: (target, key, value) => {
         const oldProps = { ...target };
         target[key] = value;
-        context.eventBus().emit(Block.EVENTS.FLOW_CDU, oldProps);
+        this.eventBus().emit(Block.EVENTS.FLOW_CDU, oldProps);
         return true;
       },
     });

@@ -115,7 +115,7 @@ export default class SignUpPage extends Block<SignUpProps> {
       })
     });
 
-    this.ValidateForm = new ValidateForm(this.getContent().querySelector('form'), Object.values(this.children) as Input[]);
+    this.ValidateForm = new ValidateForm(this.getContent().querySelector('form')!, Object.values(this.children) as Input[]);
   }
 
   checkForm(){
@@ -143,8 +143,8 @@ export default class SignUpPage extends Block<SignUpProps> {
             {{{PasswordAgainInput}}}
         </form>
         <div class="login-page__modal-space login-page__modal-space_signup"></div>
-        {{{SignInBtn}}}
         {{{SignUpBtn}}}
+        {{{SignInBtn}}}
     </div>
 </div>`;
   }

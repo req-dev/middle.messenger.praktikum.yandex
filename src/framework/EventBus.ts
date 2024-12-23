@@ -1,7 +1,7 @@
 class EventBus {
-  protected listeners: Record<string, ((...args) => void)[]> = {};
+  protected listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
 
-  on(event: string, callback: (...args) => void) {
+  on(event: string, callback: (...args: unknown[]) => void) {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
@@ -9,7 +9,7 @@ class EventBus {
     this.listeners[event].push(callback);
   }
 
-  off(event: string, callback: (...args) => void) {
+  off(event: string, callback: (...args: unknown[]) => void) {
     if (!this.listeners[event]) {
       throw new Error(`No such event: ${event}`);
     }
@@ -19,7 +19,7 @@ class EventBus {
     );
   }
 
-  emit(event: string, ...args) {
+  emit(event: string, ...args: unknown[]) {
     if (!this.listeners[event]) {
       throw new Error(`No such event: ${event}`);
     }

@@ -26,14 +26,21 @@ class ValidateForm {
 
     this.form.querySelectorAll('input').forEach((el) => {
       const name = el.getAttribute('name');
-      inputs[name] = el as HTMLInputElement;
+      if (name){
+        inputs[name] = el as HTMLInputElement;
+      }
     });
+
+    const nameRegex = /^[А-ЯA-ZЁ][а-яa-zё-]*$/;
+    const loginRegex = /^(?=.*[A-Za-z])[A-Za-z0-9-_]{3,20}$/;
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,40}$/;
+    const phoneRegex = /^\+?\d{10,15}$/;
 
     Object.entries(inputs).forEach(([inputName, input]) => {
       switch (inputName){
         case 'first_name':
         case 'second_name':
-          const nameRegex = /^[А-ЯA-ZЁ][а-яa-zё\-]*$/;
           if (!nameRegex.test(input.value)){
             errors.push({
               inputName,
@@ -42,7 +49,6 @@ class ValidateForm {
           }
           break;
         case 'login':
-          const loginRegex = /^(?=.*[A-Za-z])[A-Za-z0-9-_]{3,20}$/;
           if (!loginRegex.test(input.value)){
             errors.push({
               inputName,
@@ -51,7 +57,6 @@ class ValidateForm {
           }
           break;
         case 'email':
-          const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
           if (!emailRegex.test(input.value)){
             errors.push({
               inputName,
@@ -60,7 +65,7 @@ class ValidateForm {
           }
           break;
         case 'password':
-          const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,40}$/;
+        case 'newPassword':
           if (!passwordRegex.test(input.value)){
             errors.push({
               inputName,
@@ -69,7 +74,6 @@ class ValidateForm {
           }
           break;
         case 'phone':
-          const phoneRegex = /^\+?\d{10,15}$/;
           if (!phoneRegex.test(input.value)){
             errors.push({
               inputName,
@@ -85,10 +89,14 @@ class ValidateForm {
             });
           }
           break;
-        case 'password_repeat':
+        case 'display_name':
+          if (input.value.trim() === ''){
+            errors.push({
+              inputName,
+              message: 'Nickname cannot be empty'
+            });
+          }
           break;
-        default:
-          console.warn(`Unknown input ${inputName}, validation was skipped.`);
       }
     });
 
@@ -98,7 +106,7 @@ class ValidateForm {
     if (password && passwordRepeat){
       if (password.value !== passwordRepeat.value){
         errors.push({
-          inputName: passwordRepeat.getAttribute('name'),
+          inputName: passwordRepeat.getAttribute('name')!,
           message: 'Passwords do not match'
         });
       }
@@ -110,7 +118,7 @@ class ValidateForm {
     if (newPassword && repeatNewPassword){
       if (newPassword.value !== repeatNewPassword.value){
         errors.push({
-          inputName: repeatNewPassword.getAttribute('name'),
+          inputName: repeatNewPassword.getAttribute('name')!,
           message: 'Passwords do not match'
         });
       }

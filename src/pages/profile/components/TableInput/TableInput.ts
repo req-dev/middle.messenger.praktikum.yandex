@@ -1,27 +1,21 @@
 // language=hbs
-import Block, {blockProps} from '../../../../framework/Block';
+import Input from '../../../../components/Input';
+import { InputProps } from '../../../../components/Input';
 
-interface TableInputProps extends blockProps {
+interface TableInputProps extends InputProps {
   hint: string,
-  type: 'text' | 'password' | 'email' | 'tel',
-  placeholder: string,
-  name: string,
-  id: string,
-  value?: string,
 }
 
-export default class TableInput extends Block<TableInputProps>{
+export default class TableInput extends Input{
   constructor(props: TableInputProps) {
-    super('div', {
+    super({
       ...props,
-      attr: {
-        class: 'profile-page__body-card-item-property',
-        id: props.id
-      }
+      className: 'profile-page__body-card-item-property',
     });
   }
+
   render() {
     return `<label for="{{id}}" class="profile-page__body-card-item-property-label">{{hint}}</label>
-            <input type="{{type}}" id="{{id}}" name="{{name}}" placeholder="{{placeholder}}" value="{{value}}" class="profile-page__body-card-item-property-input">`;
+            <input type="{{type}}" id="{{id}}" name="{{name}}" placeholder="{{placeholder}}" value="{{value}}" title="{{errorText}}" class="profile-page__body-card-item-property-input{{#if errorText}} profile-page__body-card-item-property-input_red{{/if}}">`;
   }
 }

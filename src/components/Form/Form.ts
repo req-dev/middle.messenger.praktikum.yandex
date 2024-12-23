@@ -4,8 +4,9 @@ import Input from '../Input';
 import { ValidateForm, IValidateFormResult } from '../../unitilies/ValidateForm';
 
 interface FormProps extends blockProps {
-  onSubmit?: (result: IValidateFormResult) => void;
-  childrenList: { inputs: Block<blockProps>[]; } & Record<string, Block<blockProps>[]>;
+  onSubmit?: (result: IValidateFormResult) => void,
+  childrenList: { inputs: Block<blockProps>[]; } & Record<string, Block<blockProps>[]>,
+  disabled?: boolean,
 }
 
 export default class Form extends Block<FormProps>{
@@ -15,6 +16,7 @@ export default class Form extends Block<FormProps>{
     super('form', {
       ...props,
       events: {
+        ...props.events,
         submit: (e: Event) => {
           e.preventDefault();
           this.submit();
@@ -23,7 +25,7 @@ export default class Form extends Block<FormProps>{
     });
     this.ValidateForm = new ValidateForm(
       this.getContent() as HTMLFormElement,
-      Object.values(this.children) as Input[]
+      Object.values(this.children) as unknown as Input[]
     );
   }
 
@@ -48,13 +50,13 @@ export default class Form extends Block<FormProps>{
           blur: () => this.checkForm()
         }
       });
-    })
+    });
   }
 
   render() {
     return `
-    {{{inputs}}}
     <input type="submit" value="submit" hidden>
+    {{{inputs}}}
     `;
   }
 }
