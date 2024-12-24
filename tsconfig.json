@@ -18,7 +18,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
-    ".eslintrc.cjs"
+    ".eslintrc.cjs",
+    ".eslintignore"
   ],
   "exclude": ["node_modules", "dist", ".idea"]
 }

@@ -23,19 +23,22 @@
 * [/login](https://yp-messr.netlify.app/login)
 * [/signup](https://yp-messr.netlify.app/signup)
 * [/chats](https://yp-messr.netlify.app/chats)
-* [/profileMain](https://yp-messr.netlify.app/profileMain)
-* [/profileEdit](https://yp-messr.netlify.app/profileEdit)
+* [/profile](https://yp-messr.netlify.app/profile)
 * [/500](https://yp-messr.netlify.app/500)
 * [/404](https://yp-messr.netlify.app/404)
 
 Также в приложении реализован роутинг для навигации по страницам при `нажатии стрелки вверх` или `кнопки пробела`
 
-### Установка
+### Команды
 
 - `npm run start` — сборка и запуск проекта на localhost:3000
+- `npm run lint` — запуск ESLint
+- `npm run lint:style` — запуск StyleLint
 
 ### Использованные технологии
 
 * [Handlebars](https://handlebarsjs.com/guide/#what-is-handlebars)
 * [Vite](https://vite.dev/)
 * [PostCSS](https://postcss.org/)
+* [ESLint](https://eslint.org/)
+* [StyleLint](https://stylelint.io/)

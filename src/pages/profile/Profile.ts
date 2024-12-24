@@ -13,8 +13,8 @@ interface ProfilePageProps extends blockProps {
   changePasswordButton?: TableButton,
   logOutButton?: TableButton,
   saveChangesButton?: Button,
-  editingPasswordMode: boolean,
-  editingMode: boolean,
+  editingPasswordMode?: boolean,
+  editingMode?: boolean,
 }
 
 export default class ProfilePage extends Block<ProfilePageProps> {
@@ -22,7 +22,7 @@ export default class ProfilePage extends Block<ProfilePageProps> {
   editProfileForm: Form;
   editPasswordForm: Form;
 
-  constructor(props: ProfilePageProps) {
+  constructor(props?: ProfilePageProps) {
     super('div', {
       ...props,
       className: 'profile-page',

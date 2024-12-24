@@ -37,8 +37,8 @@ export class Input extends Block<InputProps>{
   componentDidUpdate(oldProps: InputProps): boolean {
     // TODO review
     // block will rerender only if error text changes
-    const oldEventsLength = Object.keys(oldProps.events).length;
-    const eventsLength = Object.keys(this.props.events).length;
+    const oldEventsLength = oldProps.events ? Object.keys(oldProps.events).length : 0;
+    const eventsLength = this.props.events ? Object.keys(this.props.events).length : 0;
     return oldProps?.errorText != this.props?.errorText || oldEventsLength !== eventsLength;
   }
 

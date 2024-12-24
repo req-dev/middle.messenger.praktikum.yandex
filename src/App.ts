@@ -43,10 +43,7 @@ export default class App {
         this.pageBlock = new Pages.ChatsPage();
         break;
       case 'profile':
-        this.pageBlock = new Pages.ProfilePage({
-          editingPasswordMode: false,
-          editingMode: false
-        });
+        this.pageBlock = new Pages.ProfilePage();
         break;
       case '500':
         this.pageBlock = new Pages.ErrorPage({

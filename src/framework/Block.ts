@@ -100,7 +100,7 @@ abstract class Block<T extends blockProps = blockProps> {
     const { events = {} } = this.props;
 
     Object.keys(events).forEach((eventName) => {
-      this.targetElement?.addEventListener(eventName, events[eventName]);
+      this.targetElement.addEventListener(eventName, events[eventName]);
     });
   }
 
@@ -145,8 +145,9 @@ abstract class Block<T extends blockProps = blockProps> {
 
   // user can override it
   // if it returns true, block will rerender
-  // I disabled this rule so auto-complete can work and user will see the reference with args
-  componentDidUpdate(oldProps: T): boolean { return true; }
+  componentDidUpdate(oldProps: T): boolean {
+    return JSON.stringify(oldProps) !== JSON.stringify(this.props);
+  }
 
   protected addAttributes() {
     const attr = this.props.attr || {};
@@ -190,7 +191,7 @@ abstract class Block<T extends blockProps = blockProps> {
 
   private _render() {
     const additionalBlocks: Record<string, Block<T>[]> = {}; // blocks from childrenList array will be here
-    const propsAndStubs = { ...this.props }; // rest of the props
+    const propsAndStubs: blockProps = { ...this.props }; // rest of the props
 
     for (const [key, child] of Object.entries(this.children)) {
       const [prefix] = key.split('__');
@@ -228,9 +229,9 @@ abstract class Block<T extends blockProps = blockProps> {
     this._removeEvents();
     this._element.innerHTML = ''; // Clear previous HTML
     this._element.appendChild(template.content);
-    this._addEvents();
     this.removeAttributes();
     this.addAttributes();
+    this._addEvents();
   }
 
   // user have to override it
@@ -240,15 +241,17 @@ abstract class Block<T extends blockProps = blockProps> {
     return this.element;
   }
 
-  private _makePropsProxy(props: T) {
+  private _makePropsProxy(props: blockProps): T {
     return new Proxy(props, {
       set: (target, key, value) => {
         const oldProps = { ...target };
-        target[key] = value;
+        if (typeof key === 'string') {
+          target[key] = value;
+        }
         this.eventBus().emit(Block.EVENTS.FLOW_CDU, oldProps);
         return true;
       },
-    });
+    }) as T;
   }
 
   private _createDocumentElement(tagName: string) {
