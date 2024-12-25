@@ -1,5 +1,5 @@
-import './style.pcss';
-import loginPage from './signin.hbs?raw';
-import signupPage from './signup.hbs?raw';
+import './LoginPages.pcss';
+import SignInPage from './SignIn';
+import SignUpPage from './SignUp';
 
-export {loginPage, signupPage};
+export { SignInPage, SignUpPage };

@@ -1,3 +1,4 @@
-import './style.pcss';
-import errorPageTemplate from './template.hbs?raw';
-export default errorPageTemplate;
+import './Error.pcss';
+import ErrorPage from './Error';
+
+export default ErrorPage;

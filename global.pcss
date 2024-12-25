@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 body{
-    --color-red: #FF0000;
+    --color-red: #F00;
     --color-bkg: #0F0F0F;
     --color-near-bkg: #131313;
     --color-card-on-nb: #202020;
@@ -12,14 +12,16 @@ body{
     --color-accent-element: #0B1A0C;
     --color-border: #1E1E1E;
 
+    background: var(--color-bkg);
     margin: 0;
     padding: 0;
-    background: var(--color-bkg);
 }
+
 *{
     -webkit-tap-highlight-color: transparent;
 }
+
 ::selection {
-    background: rgba(35, 134, 54, 0.6);
+    background: rgb(35 134 54 / 60%);
     color: #fff
 }
