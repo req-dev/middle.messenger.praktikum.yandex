@@ -1,36 +1,41 @@
 .input{
-    width: 100%;
     display: flex;
     flex-direction: column;
     margin: 16px 0;
+    width: 100%;
 }
+
 .input__hint{
     color: var(--color-non-accent-text);
-    font-family: "Inter", sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 9px;
     font-weight: 500;
     line-height: 100%;
 }
+
 .input__error{
     color: var(--color-red);
-    font-family: "Inter", sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 9px;
     font-weight: 500;
     line-height: 100%;
     margin-top: 7px;
 }
+
 .input__input{
-    outline: none;
     background: transparent;
     border: none;
     border-bottom: 1px solid var(--color-border);
-    padding: 7px 0;
     color: #fff;
+    outline: none;
+    padding: 7px 0;
 }
+
 .input__input:focus{
     border-bottom: 1px solid var(--color-accent);
 }
+
 .input__input_error{
-    color: var(--color-red);
     border-bottom: 1px solid var(--color-red);
+    color: var(--color-red);
 }

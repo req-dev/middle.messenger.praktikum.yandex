@@ -1,4 +1,5 @@
-//language=hbs
-import './style.pcss';
-const ModalTitle = `<h1 class="modal-title">{{title}}</h1>`;
+// language=hbs
+import './ModalTitle.pcss';
+import ModalTitle from './ModalTitle';
+
 export default ModalTitle;

@@ -1,4 +1,4 @@
-//language=hbs
-import './style.pcss';
-const ButtonS = `<button class="button-small" id="{{id}}">{{text}}</button>`;
+import './ButtonS.pcss';
+import ButtonS from './ButtonS';
+
 export default ButtonS;
