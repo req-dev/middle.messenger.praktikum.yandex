@@ -5,6 +5,8 @@ interface IHTTPOptions {
   timeout?: number,
 }
 
+type HTTPMethod = (data: string, options?: IHTTPOptions) => Promise<XMLHttpRequest>;
+
 class HTTP {
   private queryStringify = (data: Record<string, string>): string => {
     const keys = Object.keys(data);
@@ -20,32 +22,32 @@ class HTTP {
     return params;
   };
 
-  get = (url: string, options: IHTTPOptions = {}) => {
+  get: HTTPMethod = (url, options = {}) => {
     return this.request(url, {
       ...options,
       method: 'GET'
-    }, options.timeout);
+    }, options?.timeout);
   };
 
-  post = (url: string, options: IHTTPOptions = {}) => {
+  post: HTTPMethod = (url, options = {}) => {
     return this.request(url, {
       ...options,
       method: 'POST'
-    }, options.timeout);
+    }, options?.timeout);
   };
 
-  put = (url: string, options: IHTTPOptions = {}) => {
+  put: HTTPMethod = (url, options = {}) => {
     return this.request(url, {
       ...options,
       method: 'PUT'
-    }, options.timeout);
+    }, options?.timeout);
   };
 
-  delete = (url: string, options: IHTTPOptions = {}) => {
+  delete: HTTPMethod = (url, options = {}) => {
     return this.request(url, {
       ...options,
       method: 'DELETE'
-    }, options.timeout);
+    }, options?.timeout);
   };
 
   request = (url: string, options: IHTTPOptions = {}, timeout = 5000): Promise<XMLHttpRequest> => {
