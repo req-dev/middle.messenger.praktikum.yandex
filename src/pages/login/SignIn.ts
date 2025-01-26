@@ -2,29 +2,38 @@ import Block, { blockProps } from '../../framework/Block';
 import ModalTitle from '../../components/ModalTitle';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import Form from '../../components/Form';
-
-import { IValidateFormResult } from '../../unitilies/ValidateForm';
+import Form, { IFormStateData } from '../../components/Form';
+import connect from '../../framework/connectStore';
+import Router from '../../framework/Router';
+import UserLoginController from '../../controllers/user-login-controller';
+import { LoginFormModel } from '../../types/data';
 
 interface SignInProps extends blockProps{
   ModalTitle?: ModalTitle,
   form?: Form,
   SignInBtn?: Button,
   SignUpBtn?: Button,
+  FormStateData?: IFormStateData
 }
 
-export default class SignInPage extends Block<SignInProps> {
+class SignInPage extends Block<SignInProps> {
 
   form: Form;
+  signInBtn: Button;
+  signUpBtn: Button;
+  router: Router;
+  userLoginController: UserLoginController;
 
   constructor(props?: SignInProps) {
-    super('div', {
+    super({
       ...props,
       ModalTitle: new ModalTitle({
         text: 'Log in'
       }),
 
       form: new Form({
+        ...props?.FormStateData,
+        statePath: 'signinPage.FormStateData',
         childrenList: {
           inputs: [
             new Input({
@@ -49,31 +58,46 @@ export default class SignInPage extends Block<SignInProps> {
         text: 'Sign in',
         attr: { id: 'signinBtn' },
         events: {
-          click: () => this.submit()
+          click: () => this.form.submit()
         }
       }),
       SignUpBtn: new Button({
         text: 'Create account',
         darkMode: true,
-        attr: { id: 'signupBtn' }
+        attr: { id: 'signupBtn' },
+        events: {
+          click: () => this.router.go('/sign-up')
+        }
       })
     });
+
+    this.router = new Router();
+    this.userLoginController = new UserLoginController();
   }
 
   componentDidMount() {
     this.form = this.children['form'] as Form;
+    this.signInBtn = this.children['SignInBtn'] as Button;
+    this.signUpBtn = this.children['SignUpBtn'] as Button;
 
     this.form.setProps({
-      onSubmit: this.submitted
+      onSubmit: () => this.submitted()
     });
   }
 
-  submit(){
-    this.form.submit();
+  componentDidUpdate(oldProps: SignInProps): boolean {
+    this.form.setProps({ ...this.props?.FormStateData });
+    this.signInBtn.setProps({
+      disabled: this.props?.FormStateData?.disabled,
+    });
+    this.signUpBtn.setProps({
+      disabled: this.props?.FormStateData?.disabled,
+    });
+    return super.componentDidUpdate(oldProps);
   }
 
-  submitted(result: IValidateFormResult){
-    console.log(Object.fromEntries(result.data.entries()));
+  submitted(){
+    this.userLoginController.login(this.form.getData() as LoginFormModel);
   }
 
   render() {
@@ -89,3 +113,7 @@ export default class SignInPage extends Block<SignInProps> {
 </div>`;
   }
 }
+
+const mapStateToProps = state => state.signinPage;
+
+export default connect(mapStateToProps)(SignInPage);

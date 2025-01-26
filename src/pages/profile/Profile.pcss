@@ -53,43 +53,6 @@
     width: 540px;
 }
 
-.profile-page__body-avatar{
-    background-color: var(--color-non-accent-text);
-    background-image: url("https://avatar.iran.liara.run/public");
-    background-repeat: no-repeat;
-    background-size: 100%;
-    border-radius: 100%;
-    height: 130px;
-    overflow: hidden;
-    width: 130px;
-}
-
-.profile-page__body-avatar-hint{
-    background-color: rgb(0 0 0 / 84%);
-    cursor: pointer;
-    display: flex;
-    height: 100%;
-    opacity: 0;
-    width: 100%;
-}
-
-.profile-page__body-avatar-hint:hover{
-    opacity: 1;
-}
-
-.profile-page__body-avatar-hint-text{
-    color: #fff;
-    font-family: Inter, sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 100%;
-    margin: auto;
-}
-
-.profile-page__body-avatar-input{
-    opacity: 0;
-}
-
 .profile-page__body-name{
     color: #fff;
     font-family: Inter, sans-serif;
@@ -117,6 +80,7 @@
     border-bottom: 1px solid var(--color-border);
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     margin: 0;
     padding: 10px 0;
     width: 100%;
@@ -126,6 +90,10 @@
     border-bottom: none;
 }
 
+.profile-page__body-card-item-property-container{
+
+}
+
 .profile-page__body-card-item-property-label{
     color: var(--color-non-accent-text);
     font-family: Inter, sans-serif;
@@ -133,6 +101,7 @@
     font-weight: 500;
     line-height: 100%;
     width: 50%;
+    -webkit-user-select: none;
 }
 
 .profile-page__body-card-item-property-btn{

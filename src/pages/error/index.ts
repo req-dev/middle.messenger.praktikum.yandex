@@ -1,4 +1,5 @@
 import './Error.pcss';
-import ErrorPage from './Error';
+import Error404 from './Error404';
+import Error500 from './Error500';
 
-export default ErrorPage;
+export { Error404, Error500 };

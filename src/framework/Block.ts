@@ -1,6 +1,16 @@
 import Handlebars from 'handlebars';
 import { EventBus } from './EventBus';
 import getRandomNumber from '../unitilies/getRandomNumber';
+import isEqual from '../unitilies/isEqual';
+
+enum BlockEvents {
+  INIT = 'init',
+  FLOW_CDM = 'flow:component-did-mount',
+  FLOW_CDU = 'flow:component-did-update',
+  FLOW_CWU = 'flow:component-will-unmount',
+  FLOW_CAU = 'flow:component-after-update',
+  FLOW_RENDER = 'flow:render',
+}
 
 export interface blockProps extends Record<string, unknown>{
   childrenList?: Record<string, Block[]>,
@@ -9,28 +19,23 @@ export interface blockProps extends Record<string, unknown>{
   attr?: { class?: string, listid?: string, belongsToList?: string } & Record<string, string>,
   settings?: {
     withInternalID?: boolean,
-    targetElementForEvents?: string
+    targetElementForEvents?: string,
+    excludedAttributes?: string[], // list of attributes that will not be affected while rerender
   }
   __id?: number
 }
 
 abstract class Block<T extends blockProps = blockProps> {
-  static EVENTS = {
-    INIT: 'init',
-    FLOW_CDM: 'flow:component-did-mount',
-    FLOW_CDU: 'flow:component-did-update',
-    FLOW_CWU: 'flow:component-will-unmount',
-    FLOW_RENDER: 'flow:render',
-  };
 
   private _element: HTMLElement;
   private readonly _meta: { tagName: string, props: blockProps };
+  private visible: boolean;
   private _id = getRandomNumber();
   public props: T;
   public eventBus: () => EventBus;
   protected children: Record<string, Block<T>> = {};
 
-  protected constructor(tagName = 'div', propsAndChildren: T) {
+  protected constructor(propsAndChildren: T, tagName: string = 'div') {
     const getChildren = this._getChildren(propsAndChildren);
     const { children } = getChildren;
     let { props } = getChildren;
@@ -38,6 +43,7 @@ abstract class Block<T extends blockProps = blockProps> {
     this.children = children;
 
     props = { ...props, __id: this._id };
+    this.visible = true;
     this._meta = {
       tagName,
       props,
@@ -47,15 +53,16 @@ abstract class Block<T extends blockProps = blockProps> {
     this.eventBus = () => eventBus;
 
     this._registerEvents(eventBus);
-    eventBus.emit(Block.EVENTS.INIT);
+    eventBus.emit(BlockEvents.INIT);
   }
 
   private _registerEvents(eventBus: EventBus) {
-    eventBus.on(Block.EVENTS.INIT, this._init.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CWU, this._componentWillUnmount.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_RENDER, this._render.bind(this));
+    eventBus.on(BlockEvents.INIT, this._init.bind(this));
+    eventBus.on(BlockEvents.FLOW_CDM, this._componentDidMount.bind(this));
+    eventBus.on(BlockEvents.FLOW_CDU, this._componentDidUpdate.bind(this));
+    eventBus.on(BlockEvents.FLOW_CWU, this._componentWillUnmount.bind(this));
+    eventBus.on(BlockEvents.FLOW_CAU, this._componentAfterUpdate.bind(this));
+    eventBus.on(BlockEvents.FLOW_RENDER, this._render.bind(this));
   }
 
   private _createResources() {
@@ -93,7 +100,7 @@ abstract class Block<T extends blockProps = blockProps> {
 
   private _init() {
     this._createResources();
-    this.eventBus().emit(Block.EVENTS.FLOW_RENDER);
+    this.eventBus().emit(BlockEvents.FLOW_RENDER);
   }
 
   private _addEvents() {
@@ -124,7 +131,7 @@ abstract class Block<T extends blockProps = blockProps> {
   componentDidMount(): void { }
 
   dispatchComponentDidMount() {
-    this.eventBus().emit(Block.EVENTS.FLOW_CDM);
+    this.eventBus().emit(BlockEvents.FLOW_CDM);
   }
 
   private _componentWillUnmount() {
@@ -138,16 +145,24 @@ abstract class Block<T extends blockProps = blockProps> {
   private _componentDidUpdate(oldProps: T) {
     const needRerender = this.componentDidUpdate(oldProps);
     if (needRerender) {
-      this.eventBus().emit(Block.EVENTS.FLOW_CWU);
+      this.eventBus().emit(BlockEvents.FLOW_CWU);
       this._render();
+      this.eventBus().emit(BlockEvents.FLOW_CAU);
     }
   }
 
   // user can override it
   // if it returns true, block will rerender
   componentDidUpdate(oldProps: T): boolean {
-    return JSON.stringify(oldProps) !== JSON.stringify(this.props);
+    return !isEqual(oldProps, this.props);
   }
+
+  private _componentAfterUpdate() {
+    this.componentAfterUpdate();
+  }
+
+  // user can override it
+  componentAfterUpdate(): void { }
 
   protected addAttributes() {
     const attr = this.props.attr || {};
@@ -167,8 +182,13 @@ abstract class Block<T extends blockProps = blockProps> {
   }
 
   protected removeAttributes() {
-    while (this._element.attributes.length > 0) {
-      this._element.removeAttribute(this._element.attributes[0].name);
+    const attrs = this._element.attributes;
+    const excluded = (this.props.settings?.excludedAttributes ?? []) as string[];
+
+    for (const attr of attrs) {
+      if (!excluded.includes(attr.name)) {
+        this._element.removeAttribute(attr.name);
+      }
     }
   }
 
@@ -232,10 +252,13 @@ abstract class Block<T extends blockProps = blockProps> {
     this.removeAttributes();
     this.addAttributes();
     this._addEvents();
+    this._applyVisible();
   }
 
   // user have to override it
-  abstract render(): string
+  render(): string {
+    return ''
+  }
 
   getContent() {
     return this.element;
@@ -248,7 +271,7 @@ abstract class Block<T extends blockProps = blockProps> {
         if (typeof key === 'string') {
           target[key] = value;
         }
-        this.eventBus().emit(Block.EVENTS.FLOW_CDU, oldProps);
+        this.eventBus().emit(BlockEvents.FLOW_CDU, oldProps);
         return true;
       },
     }) as T;
@@ -263,11 +286,32 @@ abstract class Block<T extends blockProps = blockProps> {
   }
 
   show() {
-    this.getContent().style.display = 'block';
+    this.visible = true;
+    this._applyVisible();
   }
 
   hide() {
-    this.getContent().style.display = 'none';
+    this.visible = false;
+    this._applyVisible();
+  }
+
+  private _applyVisible() {
+    const element = this.getContent();
+
+    if (this.visible) {
+      const style = element.getAttribute('style');
+
+      if (style) {
+        const fixedStyle = style.replace('display: none;', '')
+          .replace('display:none;', '')
+          .replace('display: none', '')
+          .replace('display:none', '');
+
+        element.setAttribute('style', fixedStyle);
+      }
+    } else {
+      element.style.display = 'none';
+    }
   }
 }
 

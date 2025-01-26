@@ -3,32 +3,58 @@ import BackButton from './components/BackButton';
 import Button from '../../components/Button';
 import TableInput from './components/TableInput';
 import TableButton from './components/TableButton';
-import Form from '../../components/Form';
-import { IValidateFormResult } from '../../unitilies/ValidateForm';
+import Form, { IFormStateData } from '../../components/Form';
+import UserSessionController from '../../controllers/user-session-controller';
+import UserAccountController from '../../controllers/user-account-controller';
+import connect from '../../framework/connectStore';
+import isEqual from '../../unitilies/isEqual';
+import { UserModel, UpdateProfileRequest, UpdatePasswordRequest } from '../../types/data';
+import store from '../../framework/Store';
+import UpdateModalAvatar from './components/UpdateAvatarModal';
+import UpdateAvatarButton from './components/UpdateAvatarButton';
 
 interface ProfilePageProps extends blockProps {
+  updateAvatarButton?: Block,
   editProfileForm?: Form,
   editPasswordForm?: Form,
   editButton?: TableButton,
   changePasswordButton?: TableButton,
   logOutButton?: TableButton,
   saveChangesButton?: Button,
+  cancelButton?: Button,
+  modal?: Block,
+
   editingPasswordMode?: boolean,
   editingMode?: boolean,
+
+  editProfileFormData?: IFormStateData,
+  editPasswordFormData?: IFormStateData,
+  userData?: UserModel
 }
 
-export default class ProfilePage extends Block<ProfilePageProps> {
+class ProfilePage extends Block<ProfilePageProps> {
 
   editProfileForm: Form;
   editPasswordForm: Form;
+  saveChangesButton: Button;
+  cancelButton: Button;
+  userSessionController: UserSessionController;
+  userAccountController: UserAccountController;
+  modal: Block;
 
   constructor(props?: ProfilePageProps) {
-    super('div', {
+    super({
       ...props,
-      className: 'profile-page',
 
+      updateAvatarButton: new UpdateAvatarButton({
+        events: {
+          click: () => this.modal.setProps({ visible: true })
+        }
+      }),
       editProfileForm: new Form({
         className: 'profile-page__body-card',
+        ...props?.editProfileFormData,
+        statePath: 'profilePage.editProfileFormData',
         childrenList: {
           inputs: [
             new TableInput({
@@ -37,7 +63,6 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'emailInput',
               hint: 'Email',
               placeholder: 'ivan@gmail.com',
-              value: 'pochta@yandex.ru'
             }),
             new TableInput({
               type: 'text',
@@ -45,7 +70,6 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'emailInput',
               hint: 'Login',
               placeholder: 'ivan',
-              value: 'ivanivanov'
             }),
             new TableInput({
               type: 'text',
@@ -53,7 +77,6 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'firstName',
               hint: 'First name',
               placeholder: 'Иван',
-              value: 'Иван'
             }),
             new TableInput({
               type: 'text',
@@ -61,7 +84,6 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'secondName',
               hint: 'Second name',
               placeholder: 'Иванов',
-              value: 'Иванов'
             }),
             new TableInput({
               type: 'text',
@@ -69,15 +91,13 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'displayName',
               hint: 'Nickname in Chats',
               placeholder: 'Иван',
-              value: 'Иван'
             }),
             new TableInput({
               type: 'tel',
               name: 'phone',
               id: 'phone',
               hint: 'Phone',
-              placeholder: '+7 (909) 967 30 30',
-              value: '+7 (909) 967 30 30'
+              placeholder: '+71307654942',
             }),
           ]
         }
@@ -85,6 +105,8 @@ export default class ProfilePage extends Block<ProfilePageProps> {
 
       editPasswordForm: new Form({
         className: 'profile-page__body-card',
+        ...props?.editPasswordFormData,
+        statePath: 'profilePage.editPasswordFormData',
         childrenList: {
           inputs: [
             new TableInput({
@@ -93,7 +115,6 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'oldPassword',
               hint: 'Old password',
               placeholder: '•••••••••',
-              value: 'asSB&&h78uHDd3'
             }),
             new TableInput({
               type: 'password',
@@ -101,7 +122,6 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'newPassword',
               hint: 'New password',
               placeholder: '•••••••••••',
-              value: 'asSB&&h78uHDd3sady7'
             }),
             new TableInput({
               type: 'password',
@@ -109,141 +129,181 @@ export default class ProfilePage extends Block<ProfilePageProps> {
               id: 'repeatNewPassword',
               hint: 'Repeat new password',
               placeholder: '•••••••••••',
-              value: 'asSB&&h78uHDd3sady7'
             }),
           ]
         }
       }),
 
+      modal: new UpdateModalAvatar({}),
+
       editButton: new TableButton({
-        text: 'Edit'
+        text: 'Edit',
+        events: {
+          click: () => store.set('profilePage.editingMode', true)
+        }
       }),
       changePasswordButton: new TableButton({
-        text: 'Change Password'
+        text: 'Change Password',
+        events: {
+          click: () => store.set('profilePage', {
+            editingMode: true,
+            editingPasswordMode: true
+          })
+        }
       }),
       logOutButton: new TableButton({
         text: 'Log out',
-        red: true
+        red: true,
+        events: {
+          click: () => this.userSessionController.logout()
+        }
       }),
       saveChangesButton: new Button({
-        text: 'Save changes'
+        text: 'Save changes',
+        events: {
+          click: () => this.saveChanges()
+        }
+      }),
+      cancelButton: new Button({
+        text: 'Cancel',
+        darkMode: true,
+        events: {
+          click: () => this.back()
+        }
       }),
 
-      backButton: new BackButton()
+      backButton: new BackButton({
+        events: {
+          click: () => this.back()
+        }
+      })
     });
+
+    this.userSessionController = new UserSessionController();
+    this.userAccountController = new UserAccountController();
   }
 
   componentDidMount() {
-    // adding event listeners
-    // I do it here bc only after this class initialized we can pass context (this)
-    const editButton = this.children['editButton'];
-    const changePasswordButton = this.children['changePasswordButton'];
-    const saveChangesButton = this.children['saveChangesButton'];
-    const backButton = this.children['backButton'];
+    this.editProfileForm = this.children['editProfileForm'] as Form;
+    this.editPasswordForm = this.children['editPasswordForm'] as Form;
+    this.saveChangesButton = this.children['saveChangesButton'] as Button;
+    this.cancelButton = this.children['cancelButton'] as Button;
+    this.modal = this.children['modal'];
 
-    editButton.setProps({
-      events: {
-        ...editButton.props.events,
-        click: () => this.setProps({
-          editingMode: true
-        })
-      }
-    });
-    changePasswordButton.setProps({
-      events: {
-        ...changePasswordButton.props.events,
-        click: () => this.setProps({
-          editingMode: true,
-          editingPasswordMode: true
-        })
-      }
-    });
-    saveChangesButton.setProps({
-      events: {
-        ...saveChangesButton.props.events,
-        click: () => {
-          this.props.editingPasswordMode ? this.editPasswordSubmit() : this.editProfileSubmit();
-        }
-      }
-    });
-    backButton.setProps({
-      events: {
-        ...backButton.props.events,
-        click: () => this.setProps({
-          editingMode: false,
-          editingPasswordMode: false
-        })
-      }
-    });
-    this.editProfileForm = this.children['editProfileForm'] as unknown as Form;
-    this.editPasswordForm = this.children['editPasswordForm'] as unknown as Form;
 
+    this.fillProfileFormWithUser();
     this.editProfileForm.setProps({
-      onSubmit: (r: IValidateFormResult) => this.editProfileSubmitted(r)
+      onSubmit: () => this.editProfileSubmitted()
     });
     this.editPasswordForm.setProps({
-      onSubmit: (r: IValidateFormResult) => this.editPasswordSubmitted(r)
+      onSubmit: () => this.editPasswordSubmitted()
     });
+
+    // the form must be disabled until the user clicks 'edit'
+    this.editProfileForm.setProps({ disabled: true });
   }
 
-  editProfileSubmit(){
-    this.editProfileForm.submit();
+  componentDidUpdate(oldProps: ProfilePageProps): boolean {
+    // applying user data when server sends it
+    const oldUserData = (oldProps.userData as Record<string, string> | undefined) ?? {};
+    const userData = (this.props.userData as Record<string, string> | undefined) ?? {};
+    if (!isEqual(oldUserData, userData)) {
+      this.fillProfileFormWithUser();
+    }
+
+    // apply error messages to forms
+    const profileFormDisabled = Boolean(this.props?.editProfileFormData?.disabled);
+    const passwordFormDisabled = Boolean(this.props?.editPasswordFormData?.disabled);
+    const saveChangesButtonDisabled = this.props.editingMode ? profileFormDisabled || passwordFormDisabled : false;
+
+    this.saveChangesButton.setProps({ disabled: saveChangesButtonDisabled });
+    this.cancelButton.setProps({ disabled: saveChangesButtonDisabled });
+    this.editProfileForm.setProps({
+      ...this.props?.editProfileFormData,
+      disabled: profileFormDisabled | !this.props.editingMode
+    });
+    this.editPasswordForm.setProps({ ...this.props?.editPasswordFormData });
+    return super.componentDidUpdate(oldProps);
   }
 
-  editProfileSubmitted(result: IValidateFormResult){
-    this.setProps({
+  back() {
+    if (!this.props.editingMode && !this.props.editingPasswordMode) {
+      window.history.back();
+      return;
+    }
+
+    this.editProfileForm.clear();
+    this.editPasswordForm.clear();
+    this.fillProfileFormWithUser();
+    store.set('profilePage', {
       editingMode: false,
       editingPasswordMode: false
     });
-    console.log(Object.fromEntries(result.data.entries()));
   }
 
-  editPasswordSubmit(){
-    this.editPasswordForm.submit();
+  saveChanges() {
+    if (!this.props.editingMode) {
+      return;
+    }
+    if (this.props.editingPasswordMode) {
+      this.editPasswordForm.submit();
+    } else {
+      this.editProfileForm.submit();
+    }
   }
 
-  editPasswordSubmitted(result: IValidateFormResult){
-    this.setProps({
-      editingMode: false,
-      editingPasswordMode: false
-    });
-    console.log(Object.fromEntries(result.data.entries()));
+  fillProfileFormWithUser() {
+    const userData = (this.props.userData as Record<string, string> | undefined) ?? {};
+    this.editProfileForm.setValues(userData);
+  }
+
+  editProfileSubmitted(){
+    console.log(this.editProfileForm.getData());
+    this.userAccountController.updateProfile(this.editProfileForm.getData() as UpdateProfileRequest);
+  }
+
+  editPasswordSubmitted(){
+    console.log(this.editPasswordForm.getData());
+    this.userAccountController.updatePassword(this.editPasswordForm.getData() as UpdatePasswordRequest);
   }
 
   render() {
     return `
-    {{{backButton}}}
-    <div class="profile-page__body">
-        <div class="profile-page__body-center">
-            <div class="profile-page__body-center">
-                <div class="profile-page__body-avatar">
-                    <div class="profile-page__body-avatar-hint">
-                        <div class="profile-page__body-avatar-hint-text">Change Avatar</div>
-                    </div>
-                    <input class="profile-page__body-avatar-input" type="file" name="avatar" accept="image/png, image/jpeg">
-                </div>
-                <h1 class="profile-page__body-name">Scott</h1>
-                
-                {{#if editingPasswordMode}}
-                  {{{editPasswordForm}}}
-                {{else}}
-                  {{{editProfileForm}}}
-                {{/if}}
-                
-            </div>
-
-            <div class="page__body-space-between-cards"></div>
-            
-            {{#if editingMode}}
-                {{{saveChangesButton}}}
-            {{else}}
-              <div class="profile-page__body-card profile-page__body-card_actions">
-                  {{{editButton}}}
-                  {{{changePasswordButton}}}
-                  {{{logOutButton}}}
+    <div class="profile-page">
+      {{{backButton}}}
+      <div class="profile-page__body">
+          <div class="profile-page__body-center">
+              {{{modal}}}
+              <div class="profile-page__body-center">
+                  {{{updateAvatarButton}}}
+                  <h1 class="profile-page__body-name">Scott</h1>
+                  
+                  {{#if editingPasswordMode}}
+                    {{{editPasswordForm}}}
+                  {{else}}
+                    {{{editProfileForm}}}
+                  {{/if}}
+                  
               </div>
-            {{/if}}
-        </div>
+  
+              <div class="page__body-space-between-cards"></div>
+              
+              {{#if editingMode}}
+                  {{{saveChangesButton}}}
+                  {{{cancelButton}}}
+              {{else}}
+                <div class="profile-page__body-card profile-page__body-card_actions">
+                    {{{editButton}}}
+                    {{{changePasswordButton}}}
+                    {{{logOutButton}}}
+                </div>
+              {{/if}}
+          </div>
+      </div>
     </div>`;
   }
 }
+
+const mapStateToProps = state => state.profilePage;
+
+export default connect(mapStateToProps)(ProfilePage);

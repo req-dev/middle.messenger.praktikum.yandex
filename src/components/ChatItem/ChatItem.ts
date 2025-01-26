@@ -12,7 +12,7 @@ interface ChatItemProps extends blockProps {
 
 export default class ChatItem extends Block<ChatItemProps>{
   constructor(props: ChatItemProps) {
-    super('div', {
+    super({
       ...props,
       className: 'chat-item'
     });

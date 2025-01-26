@@ -22,6 +22,7 @@ export class MessageInput extends Input{
            name="{{name}}"
            class="input__input chats-page__dialog-area-reply-box-msg-form-input"
            id="{{id}}"
-           value="{{value}}">`;
+           value="{{value}}"
+           {{#if disabled}}disabled="true"{{/if}}>`;
   }
 }
