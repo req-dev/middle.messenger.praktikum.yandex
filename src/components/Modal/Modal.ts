@@ -1,18 +1,22 @@
 import './Modal.pcss';
 import Block, { blockProps } from '../../framework/Block';
 import Button from '../Button';
+import store from '../../framework/Store';
 
 export interface ModalProps extends blockProps {
   title: string,
+  bodyMessage?: string,
   childrenList?: { body: Block[]; } & Record<string, Block[]>,
   closable?: boolean,
   closableWithButton?: boolean,
   cancelButtonText?: string,
   visible?: boolean,
+  statePath?: string // if you specify this, modal will rely on global state
 }
 
 export class Modal<T extends ModalProps> extends Block<T> {
 
+  visible: boolean;
   cancelButton: Button;
 
   constructor(props: ModalProps) {
@@ -33,6 +37,8 @@ export class Modal<T extends ModalProps> extends Block<T> {
         click: () => this.closeBkgClicked()
       }
     });
+
+    this.visible = Boolean(props.visible);
   }
 
   private modalClicked(e: Event) {
@@ -53,11 +59,31 @@ export class Modal<T extends ModalProps> extends Block<T> {
   }
 
   open() {
-    this.setProps({ visible: true });
+    if (this.visible) {
+      return;
+    }
+    this.visible = true;
+
+    const { statePath } = this.props;
+    if (statePath) {
+      store.set(statePath, { visible: true });
+    } else {
+      this.setProps({ visible: true });
+    }
   }
 
   close() {
-    this.setProps({ visible: false });
+    if (!this.visible) {
+      return;
+    }
+    this.visible = false;
+
+    const { statePath } = this.props;
+    if (statePath) {
+      store.set(statePath, { visible: false });
+    } else {
+      this.setProps({ visible: false });
+    }
   }
 
   componentDidMount() {
@@ -98,6 +124,9 @@ export class Modal<T extends ModalProps> extends Block<T> {
   render() {
     return `<modal class="modal">
                 <div class="modal__title">{{title}}</div>
+                {{#if bodyMessage}}
+                    <div class="modal__message">{{bodyMessage}}</div>
+                {{/if}}
                 {{{body}}}
                 {{#if cancelButtonText}}
                     {{{cancelButton}}}

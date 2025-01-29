@@ -36,6 +36,15 @@ export default class Route {
     return pathname === this._pathname;
   }
 
+  forceRerender() {
+    if (this._block) {
+      this._block.dispatchComponentDestroy();
+      this._block = null;
+    }
+    this.render();
+    this._block.hide();
+  }
+
   render() {
     if (!this._block) {
       this._block = new this._blockClass();

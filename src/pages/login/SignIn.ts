@@ -7,8 +7,10 @@ import connect from '../../framework/connectStore';
 import Router from '../../framework/Router';
 import UserLoginController from '../../controllers/user-login-controller';
 import { LoginFormModel } from '../../types/data';
+import ModalMessage from '../../components/ModalMessage';
 
 interface SignInProps extends blockProps{
+  modalMessage: Block,
   ModalTitle?: ModalTitle,
   form?: Form,
   SignInBtn?: Button,
@@ -27,6 +29,7 @@ class SignInPage extends Block<SignInProps> {
   constructor(props?: SignInProps) {
     super({
       ...props,
+      modalMessage: new ModalMessage(),
       ModalTitle: new ModalTitle({
         text: 'Log in'
       }),
@@ -89,6 +92,7 @@ class SignInPage extends Block<SignInProps> {
     this.form.setProps({ ...this.props?.FormStateData });
     this.signInBtn.setProps({
       disabled: this.props?.FormStateData?.disabled,
+      loading: this.props?.FormStateData?.disabled,
     });
     this.signUpBtn.setProps({
       disabled: this.props?.FormStateData?.disabled,
@@ -110,6 +114,7 @@ class SignInPage extends Block<SignInProps> {
         {{{SignInBtn}}}
         {{{SignUpBtn}}}
     </div>
+    {{{modalMessage}}}
 </div>`;
   }
 }

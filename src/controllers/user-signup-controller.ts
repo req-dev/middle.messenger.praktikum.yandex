@@ -9,6 +9,14 @@ const router = new Router();
 const userAuthController = new UserSessionController();
 
 class UserSignupController {
+  private static __instance: UserSignupController;
+  constructor() {
+    if (UserSignupController.__instance) {
+      return UserSignupController.__instance;
+    }
+    UserSignupController.__instance = this;
+  }
+
   public async signup(data: SignupFormModel) {
     try {
       // Запускаем крутилку
@@ -27,6 +35,11 @@ class UserSignupController {
           router.go('/500');
           break;
         case 200:
+          store.set('globalModalMessage', {
+            title: 'Welcome',
+            bodyMessage: 'Your account has been created successfully.',
+            visible: true
+          });
           await userAuthController.getUser();
           break;
       }
@@ -34,7 +47,11 @@ class UserSignupController {
 
     } catch (error) {
       console.error(error);
-      store.set('signupPage.FormStateData.generalFormError', 'Request failed, check your internet connection');
+      store.set('globalModalMessage', {
+        title: 'Network error',
+        bodyMessage: 'Request failed, check your internet connection and try again',
+        visible: true
+      });
     } finally {
       // Останавливаем крутилку
       store.set('signupPage.FormStateData.disabled', false);

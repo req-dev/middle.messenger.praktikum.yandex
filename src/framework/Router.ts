@@ -28,9 +28,9 @@ class Router {
     this.authorized = false;
     this.userSessionController = new UserSessionController();
 
-    store.onUpdate(() => {
+    store.subscribe('authorized', () => {
       this.stateChanged();
-    });
+    })
 
     Router.__instance = this;
   }
@@ -83,12 +83,25 @@ class Router {
     return this.routes.find(route => route.match(pathname));
   }
 
+  private _rerenderAuthPages() {
+    const messenger = this.getRoute('/messenger');
+    const settings = this.getRoute('/settings');
+
+    if (messenger) {
+      messenger.forceRerender();
+    }
+    if (settings) {
+      settings.forceRerender();
+    }
+  }
+
   stateChanged() {
     const stateAuthorized = store.getState().authorized;
-    if (this.authorized !== stateAuthorized){
-      this.authorized = stateAuthorized;
-      this.go(stateAuthorized ? '/messenger' : '/');
+    this.authorized = stateAuthorized;
+    if (stateAuthorized) {
+      this._rerenderAuthPages();
     }
+    this.go(stateAuthorized ? '/messenger' : '/');
   }
 }
 

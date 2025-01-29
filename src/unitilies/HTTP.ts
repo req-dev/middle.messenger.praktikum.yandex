@@ -16,7 +16,7 @@ class HTTP {
     this.url = url;
   }
 
-  get = (url: string, options: IHTTPOptions<null> = {}) => {
+  get = <T>(url: string, options: IHTTPOptions<T> = {}) => {
     return this.request(url, {
       ...options,
       method: 'GET'

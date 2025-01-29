@@ -34,7 +34,12 @@ class ValidateFormController {
     }
   }
 
-  validate = (data: Record<string, string>): IValidateFormResult => {
+  public clearErrors() {
+    this._clearErrors();
+    this.applyErrorMessages();
+  }
+
+  public validate = (data: Record<string, string>): IValidateFormResult => {
     this.dataCascade = Object.keys(data);
     this._clearErrors();
 
@@ -81,6 +86,16 @@ class ValidateFormController {
         case 'display_name':
           if (inputValue.trim() === ''){
             this._addError(inputName, 'Nickname cannot be empty');
+          }
+          break;
+        case 'avatar':
+          if (inputValue === ''){
+            this._addError(inputName, 'File is not attached');
+          }
+          break;
+        case 'title':
+          if (inputValue.trim() === ''){
+            this._addError(inputName, 'Title cannot be empty');
           }
           break;
       }

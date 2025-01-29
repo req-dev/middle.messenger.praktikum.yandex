@@ -20,7 +20,7 @@ interface props extends blockProps {
 export type FormProps = props & IFormStateData;
 
 export default class Form extends Block<FormProps>{
-  public validateFormController: ValidateFormController;
+  private validateFormController: ValidateFormController;
 
   constructor(props: FormProps) {
     super({
@@ -36,6 +36,20 @@ export default class Form extends Block<FormProps>{
     this.validateFormController = new ValidateFormController(
       props.statePath
     );
+  }
+
+  componentDidMount() {
+    // add additional validation on blur event
+    for (const input of Object.values(this.props.childrenList.inputs)){
+      input.setProps({
+        events: {
+          ...input.props.events,
+          blur: () => this.validate()
+        }
+      });
+    }
+
+    this.updateInputs();
   }
 
   getData(): Record<string, string> {
@@ -62,36 +76,25 @@ export default class Form extends Block<FormProps>{
     }
 
     store.set(`${this.props.statePath}`, {
-      formErrors: {}, // TODO: fix, errors still there
       generalFormError: ''
     });
+    this.validateFormController.clearErrors();
+  }
+
+  validate() {
+    return this.validateFormController.validate(this.getData());
   }
 
   submit(){
     if (this.props.disabled){
       return;
     }
-    const result = this.validateFormController.validate(this.getData());
-    console.log(result);
+    const result = this.validate();
     if (!result.isCorrect) return;
 
     if (this.props?.onSubmit) {
       this.props.onSubmit(result);
     }
-  }
-
-  componentDidMount() {
-    // add additional validation on blur event
-    for (const input of Object.values(this.props.childrenList.inputs)){
-      input.setProps({
-        events: {
-          ...input.props.events,
-          blur: () => this.validateFormController.validate(this.getData())
-        }
-      });
-    }
-
-    this.updateInputs();
   }
 
   componentDidUpdate(oldProps: FormProps): boolean {

@@ -9,10 +9,12 @@ import getRandomNumber from '../../unitilies/getRandomNumber';
 
 import connect from '../../framework/connectStore';
 import Router from '../../framework/Router';
+import ModalMessage from '../../components/ModalMessage';
 
 const randomPassword = `a${getRandomNumber()}cA1`;
 
 interface SignUpProps extends blockProps{
+  modalMessage: Block,
   ModalTitle?: ModalTitle,
   form?: Form,
   SignInBtn?: Button,
@@ -33,6 +35,7 @@ class SignUpPage extends Block<SignUpProps> {
       ModalTitle: new ModalTitle({
         text: 'Create an Account'
       }),
+      modalMessage: new ModalMessage(),
 
       form: new Form({
         ...props?.FormStateData,
@@ -137,6 +140,7 @@ class SignUpPage extends Block<SignUpProps> {
     });
     this.signUpBtn.setProps({
       disabled: this.props?.FormStateData?.disabled,
+      loading: this.props?.FormStateData?.disabled,
     });
     return super.componentDidUpdate(oldProps);
   }
@@ -156,6 +160,7 @@ class SignUpPage extends Block<SignUpProps> {
         {{{SignUpBtn}}}
         {{{SignInBtn}}}
     </div>
+    {{{modalMessage}}}
 </div>`;
   }
 }

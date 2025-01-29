@@ -15,17 +15,18 @@ class UpdateModalAvatar extends Modal<UpdateModalAvatarProps> {
   applyButton: Button;
   userAccountController: UserAccountController;
 
-  constructor(props: UpdateModalAvatarProps) {
+  constructor(props?: UpdateModalAvatarProps) {
     super({
       ...props,
       title: 'Update avatar',
-      closable: true, // TODO: fix
+      statePath: 'profilePage.updateAvatarModal',
+      closable: true,
       cancelButtonText: 'Cancel',
       childrenList: {
         body: [
           new Form({
-            ...props.formData,
-            statePath: 'profilePage.modal.formData',
+            ...props?.formData,
+            statePath: 'profilePage.updateAvatarModal.formData',
             childrenList: {
               inputs: [
                 new Input({
@@ -40,7 +41,7 @@ class UpdateModalAvatar extends Modal<UpdateModalAvatarProps> {
           }),
           new Button({
             text: 'Apply',
-            disabled: props.formData?.disabled,
+            disabled: props?.formData?.disabled,
             events: {
               click: () => this.form.submit()
             }
@@ -60,21 +61,25 @@ class UpdateModalAvatar extends Modal<UpdateModalAvatarProps> {
     this.form.setProps({
       onSubmit: () => this.submitted()
     });
+
+    // when a user clicks on the form, it starts validating which causes lose focus
+    // to prevent that, form already has to have an error
+    // so that way focus will be saved, and the selected file will not get lost
+    this.form.validate();
   }
 
   componentDidUpdate(oldProps: ModalProps): boolean {
     this.form.setProps({ ...this.props.formData })
-    this.applyButton.setProps({ disabled: this.props.formData?.disabled });
+    this.applyButton.setProps({ loading: this.props.formData?.disabled });
     return super.componentDidUpdate(oldProps);
   }
 
   submitted() {
-    console.log(this.form.getFormData());
     this.userAccountController.updateAvatar(this.form.getFormData());
   }
 
 }
 
-const mapStateToProps = state => state.profilePage.modal;
+const mapStateToProps = state => state.profilePage.updateAvatarModal;
 
 export default connect(mapStateToProps)(UpdateModalAvatar);

@@ -12,8 +12,12 @@ import { UserModel, UpdateProfileRequest, UpdatePasswordRequest } from '../../ty
 import store from '../../framework/Store';
 import UpdateModalAvatar from './components/UpdateAvatarModal';
 import UpdateAvatarButton from './components/UpdateAvatarButton';
+import ModalMessage from '../../components/ModalMessage';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface ProfilePageProps extends blockProps {
+  modalMessage: Block,
+  loadingSpinner: LoadingSpinner,
   updateAvatarButton?: Block,
   editProfileForm?: Form,
   editPasswordForm?: Form,
@@ -22,7 +26,7 @@ interface ProfilePageProps extends blockProps {
   logOutButton?: TableButton,
   saveChangesButton?: Button,
   cancelButton?: Button,
-  modal?: Block,
+  updateAvatarModal?: Block,
 
   editingPasswordMode?: boolean,
   editingMode?: boolean,
@@ -40,15 +44,17 @@ class ProfilePage extends Block<ProfilePageProps> {
   cancelButton: Button;
   userSessionController: UserSessionController;
   userAccountController: UserAccountController;
-  modal: Block;
+  updateAvatarModal: Block;
 
   constructor(props?: ProfilePageProps) {
     super({
       ...props,
+      modalMessage: new ModalMessage(),
+      loadingSpinner: new LoadingSpinner(),
 
       updateAvatarButton: new UpdateAvatarButton({
         events: {
-          click: () => this.modal.setProps({ visible: true })
+          click: () => store.set('profilePage.updateAvatarModal.visible', true)
         }
       }),
       editProfileForm: new Form({
@@ -134,7 +140,7 @@ class ProfilePage extends Block<ProfilePageProps> {
         }
       }),
 
-      modal: new UpdateModalAvatar({}),
+      updateAvatarModal: new UpdateModalAvatar(),
 
       editButton: new TableButton({
         text: 'Edit',
@@ -188,7 +194,7 @@ class ProfilePage extends Block<ProfilePageProps> {
     this.editPasswordForm = this.children['editPasswordForm'] as Form;
     this.saveChangesButton = this.children['saveChangesButton'] as Button;
     this.cancelButton = this.children['cancelButton'] as Button;
-    this.modal = this.children['modal'];
+    this.updateAvatarModal = this.children['updateAvatarModal'];
 
 
     this.fillProfileFormWithUser();
@@ -216,7 +222,10 @@ class ProfilePage extends Block<ProfilePageProps> {
     const passwordFormDisabled = Boolean(this.props?.editPasswordFormData?.disabled);
     const saveChangesButtonDisabled = this.props.editingMode ? profileFormDisabled || passwordFormDisabled : false;
 
-    this.saveChangesButton.setProps({ disabled: saveChangesButtonDisabled });
+    this.saveChangesButton.setProps({
+      disabled: saveChangesButtonDisabled,
+      loading: this.props.editProfileFormData?.disabled || this.props.editPasswordFormData?.disabled
+    });
     this.cancelButton.setProps({ disabled: saveChangesButtonDisabled });
     this.editProfileForm.setProps({
       ...this.props?.editProfileFormData,
@@ -258,12 +267,10 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 
   editProfileSubmitted(){
-    console.log(this.editProfileForm.getData());
     this.userAccountController.updateProfile(this.editProfileForm.getData() as UpdateProfileRequest);
   }
 
   editPasswordSubmitted(){
-    console.log(this.editPasswordForm.getData());
     this.userAccountController.updatePassword(this.editPasswordForm.getData() as UpdatePasswordRequest);
   }
 
@@ -272,16 +279,25 @@ class ProfilePage extends Block<ProfilePageProps> {
     <div class="profile-page">
       {{{backButton}}}
       <div class="profile-page__body">
+          {{{modalMessage}}}
           <div class="profile-page__body-center">
-              {{{modal}}}
+              {{{updateAvatarModal}}}
+              
+          
               <div class="profile-page__body-center">
                   {{{updateAvatarButton}}}
-                  <h1 class="profile-page__body-name">Scott</h1>
+                  <h1 class="profile-page__body-name">Change profile</h1>
                   
-                  {{#if editingPasswordMode}}
-                    {{{editPasswordForm}}}
+                  {{#if userData}}
+                      
+                      {{#if editingPasswordMode}}
+                          {{{editPasswordForm}}}
+                      {{else}}
+                          {{{editProfileForm}}}
+                      {{/if}}
+                      
                   {{else}}
-                    {{{editProfileForm}}}
+                      {{{loadingSpinner}}}
                   {{/if}}
                   
               </div>

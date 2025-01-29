@@ -4,6 +4,14 @@ import store from '../framework/Store';
 const authApi = new SessionApi();
 
 class UserSessionController {
+  private static __instance: UserSessionController;
+  constructor() {
+    if (UserSessionController.__instance) {
+      return UserSessionController.__instance;
+    }
+    UserSessionController.__instance = this;
+  }
+
   public async getUser() {
     try {
       const result = await authApi.request();
@@ -24,7 +32,11 @@ class UserSessionController {
 
     } catch (error) {
       console.error(error);
-      alert('Request failed, check your internet connection');
+      store.set('globalModalMessage', {
+        title: 'Network error',
+        bodyMessage: 'Request failed, check your internet connection and try again',
+        visible: true
+      });
     }
   }
 
@@ -43,7 +55,11 @@ class UserSessionController {
 
     } catch (error) {
       console.error(error);
-      alert('Request failed, check your internet connection');
+      store.set('globalModalMessage', {
+        title: 'Network error',
+        bodyMessage: 'Request failed, check your internet connection and try again',
+        visible: true
+      });
     }
   }
 }

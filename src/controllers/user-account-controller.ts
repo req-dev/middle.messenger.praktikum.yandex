@@ -11,7 +11,16 @@ const avatarApi = new AvatarApi();
 const router = new Router();
 
 class UserAccountController {
+  private static __instance: UserAccountController;
+  constructor() {
+    if (UserAccountController.__instance) {
+      return UserAccountController.__instance;
+    }
+    UserAccountController.__instance = this;
+  }
+
   public async updateProfile(data: UpdateProfileRequest) {
+    let willExitEditingMode = true;
     try {
       // Запускаем крутилку
       store.set('profilePage.editProfileFormData', {
@@ -26,6 +35,7 @@ class UserAccountController {
           store.set('authorized', false);
           break;
         case 400:
+          willExitEditingMode = false;
           store.set('profilePage.editProfileFormData.generalFormError', result.response.reason);
           break;
         case 500:
@@ -33,17 +43,28 @@ class UserAccountController {
           break;
         case 200:
           store.set('profilePage.userData', result.response as UserModel);
+          store.set('globalModalMessage', {
+            title: 'Done',
+            bodyMessage: 'Your profile has been successfully updated.',
+            visible: true
+          });
           break;
       }
 
 
     } catch (error) {
       console.error(error);
-      store.set('profilePage.editProfileFormData.generalFormError', 'Request failed, check your internet connection');
+      store.set('globalModalMessage', {
+        title: 'Network error',
+        bodyMessage: 'Request failed, check your internet connection and try again',
+        visible: true
+      });
     } finally {
       // Останавливаем крутилку
       store.set('profilePage.editProfileFormData.disabled', false);
-      store.set('profilePage.editingMode', false);
+      if (willExitEditingMode) {
+        store.set('profilePage.editingMode', false);
+      }
     }
   }
 
@@ -70,18 +91,29 @@ class UserAccountController {
           router.go('/500');
           break;
         case 200:
-          // TODO: popup says everything was right
+          store.set('globalModalMessage', {
+            title: 'Done',
+            bodyMessage: 'Your password has been updated successfully. Please try to remember it at least one week :)',
+            visible: true
+          });
       }
 
 
     } catch (error) {
       console.error(error);
-      store.set('profilePage.editPasswordFormData.generalFormError', 'Request failed, check your internet connection');
+      store.set('globalModalMessage', {
+        title: 'Network error',
+        bodyMessage: 'Request failed, check your internet connection and try again',
+        visible: true
+      });
     } finally {
       // Останавливаем крутилку
       store.set('profilePage.editPasswordFormData.disabled', false);
       if (willExitEditingMode){
-        store.set('profilePage.editingMode', false);
+        store.set('profilePage', {
+          editingPasswordMode: false,
+          editingMode: false,
+        });
       }
     }
   }
@@ -89,7 +121,7 @@ class UserAccountController {
   public async updateAvatar(data: FormData) {
     try {
       // Запускаем крутилку
-      store.set('profilePage.modal', {
+      store.set('profilePage.updateAvatarModal', {
         closable: false,
         formData: {
           generalFormError: '',
@@ -104,23 +136,27 @@ class UserAccountController {
           store.set('authorized', false);
           break;
         case 400:
-          store.set('profilePage.modal.formData.generalFormError', result.response.reason);
+          store.set('profilePage.updateAvatarModal.formData.generalFormError', result.response.reason);
           break;
         case 500:
           router.go('/500');
           break;
         case 200:
           store.set('profilePage.userData', result.response as UserModel);
-          store.set('profilePage.modal.visible', false);
+          store.set('profilePage.updateAvatarModal.visible', false);
+          store.set('globalModalMessage', {
+            title: 'Done',
+            bodyMessage: 'Your profile avatar has been successfully updated. Enjoy!',
+            visible: true
+          });
       }
 
     } catch (error) {
       console.error(error);
-      store.set('profilePage.modal.formData.generalFormError', 'Request failed, check your internet connection');
+      store.set('profilePage.updateAvatarModal.formData.generalFormError', 'Request failed, check your internet connection and try again');
     } finally {
       // Останавливаем крутилку
-      store.set('profilePage.modal.formData.disabled', false);
-      store.set('profilePage.modal', {
+      store.set('profilePage.updateAvatarModal', {
         closable: true,
         formData: {
           disabled: false

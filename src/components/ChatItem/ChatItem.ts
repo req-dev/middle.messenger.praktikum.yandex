@@ -7,33 +7,40 @@ interface ChatItemProps extends blockProps {
   datestamp: string,
   message: string,
   addMePrefix?: boolean
-  counter?: number
+  counter?: number,
+  selected?: boolean,
+  id: number
 }
 
 export default class ChatItem extends Block<ChatItemProps>{
   constructor(props: ChatItemProps) {
     super({
       ...props,
-      className: 'chat-item'
+      className: 'chat-item__container',
     });
   }
+
   render() {
-    return `<img src="{{src}}" class="chat-item__img" alt="{{name}} avatar">
-    <div class="chat-item__body">
-        <div class="chat-item__body-top">
-            <div class="chat-item__body-top-name">{{name}}</div>
-            <div class="chat-item__body-top-datestamp">{{datestamp}}</div>
-        </div>
-        <div class="chat-item__body-bottom">
-            <div class="chat-item__body-bottom-message">
-                {{#if addMePrefix}}
-                    <span class="chat-item__body-bottom-message-prefix">You: </span>
-                {{/if}}
-                {{message}}</div>
-            {{#if counter}}
-                <div class="chat-item__body-bottom-counter">{{counter}}</div>
-            {{/if}}
-        </div>
-    </div>`;
+    return `
+    <div class="chat-item{{#if selected}} chat-item_selected{{/if}}">
+      <img src="{{src}}" class="chat-item__img" alt="{{name}} avatar">
+      <div class="chat-item__body">
+          <div class="chat-item__body-top">
+              <div class="chat-item__body-top-name">{{name}}</div>
+              <div class="chat-item__body-top-datestamp">{{datestamp}}</div>
+          </div>
+          <div class="chat-item__body-bottom">
+              <div class="chat-item__body-bottom-message">
+                  {{#if addMePrefix}}
+                      <span class="chat-item__body-bottom-message-prefix">You: </span>
+                  {{/if}}
+                  {{message}}</div>
+              {{#if counter}}
+                  <div class="chat-item__body-bottom-counter">{{counter}}</div>
+              {{/if}}
+          </div>
+      </div>
+    </div>
+    `;
   }
 }

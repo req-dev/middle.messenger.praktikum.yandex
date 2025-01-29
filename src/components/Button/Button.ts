@@ -1,20 +1,26 @@
 // language=hbs
+import './Button.pcss';
 import Block, {blockProps} from '../../framework/Block';
+import LoadingSpinner from '../LoadingSpinner';
 
-interface ButtonProps extends blockProps {
+export interface ButtonProps extends blockProps {
   text: string,
   darkMode?: boolean,
   disabled?: boolean,
+  loading?: boolean,
 }
 
-export default class Button extends Block<ButtonProps>{
+export default class Button<T extends ButtonProps> extends Block<T>{
   constructor(props: ButtonProps) {
     const className = `button ${props.darkMode ? 'button_dark' : ''}`;
     super({
       ...props,
-      className,
+      loadingSpinner: new LoadingSpinner(),
       settings: {
         excludedAttributes: ['disabled', 'style']
+      },
+      attr: {
+        class: className,
       }
     }, 'button');
   }
@@ -30,7 +36,7 @@ export default class Button extends Block<ButtonProps>{
 
   private updateDisabledProperty() {
     const element = this.getContent();
-    if (this.props.disabled){
+    if (this.props.disabled || this.props.loading){
       element.setAttribute('disabled', 'true');
       element.style.opacity = '0.3';
     } else {
@@ -40,6 +46,12 @@ export default class Button extends Block<ButtonProps>{
   }
 
   render() {
-    return `{{text}}`;
+    return `
+          {{#if loading}}
+              {{{loadingSpinner}}}
+          {{else}}
+              {{text}}
+          {{/if}}
+          `;
   }
 }

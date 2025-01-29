@@ -28,7 +28,6 @@ export class Input extends Block<InputProps>{
       },
       attr: {
         class: 'input',
-        id: props.id
       },
       events: {
         ...props.events,
@@ -84,6 +83,7 @@ export class Input extends Block<InputProps>{
   }
 
   private restoreValues() {
+    // restore values that were deleted rendering
     const input = (this.targetElement as HTMLInputElement);
     if (this.props.type === 'file') {
       if (this.files) {

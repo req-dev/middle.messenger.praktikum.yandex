@@ -1,110 +1,46 @@
 import Block, { blockProps } from '../../framework/Block';
-import ChatItem from '../../components/ChatItem';
 import Form, { IFormStateData } from '../../components/Form';
 import MessageInput from './components/MessageInput';
 import SendButton from './components/SendButton';
 import Router from '../../framework/Router';
 import ArrowButton from '../../components/ArrowButton';
+import ModalMessage from '../../components/ModalMessage';
+import ChatsController from '../../controllers/chats-controller';
+import ChatsListSidebar from './components/ChatsListSidebar';
+import connect from '../../framework/connectStore';
+import AddButton from './components/AddButton';
+import AddChatModal from './components/AddChatModal';
+import store from '../../framework/Store';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface ChatsPageProps extends blockProps{
+  modalMessage: Block,
+  loadingSpinner: LoadingSpinner,
   profileButton: ArrowButton,
+  chatsListSidebar: Block,
+  addButton: AddButton,
   messageForm: Form,
   messageFormData?: IFormStateData,
 
-  sendButton: SendButton
+  sendButton: SendButton,
+
+  addChatModal: Block
 }
 
-const mockData = {
-  chatsList: [
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Lucy Shtein',
-      message: 'Hey there! Wanna make some money? Of course you do! Then come to our party with Tim Cook',
-      datestamp: '10:49',
-      counter: 1
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Bro',
-      message: 'Also, the Weekend just dropped a new song, You gotta check it out!',
-      datestamp: '10:13',
-      counter: 4
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Andrew',
-      message: 'Thanks',
-      datestamp: '09:22',
-      counter: 0,
-      addMePrefix: true
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Design Destroyer',
-      message: 'Guys I have an idea about out last project! We can paint the logo blue and add some minor changes',
-      datestamp: '09:01',
-      counter: 0,
-      addMePrefix: true
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Medial Care bot',
-      message: 'Reminder: You have an appointment at 17 p.m.',
-      datestamp: 'Yesterday',
-      counter: 9,
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'CIA Agent',
-      message: 'Yes, I did',
-      datestamp: 'Yesterday',
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Maria',
-      message: 'Ok, take your time.',
-      datestamp: 'Yesterday',
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Ben',
-      message: 'Sorry, I forgot!',
-      datestamp: 'Yesterday',
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Marinette',
-      message: 'Sticker',
-      datestamp: '22 sep',
-      addMePrefix: true
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Oliver',
-      message: 'I will call you',
-      datestamp: '21 sep',
-      addMePrefix: true
-    }),
-    new ChatItem({
-      src: 'https://avatar.iran.liara.run/public',
-      name: 'Oscar',
-      message: 'Can you lend me some money?',
-      datestamp: '21 sep',
-      counter: 44,
-    }),
-  ]
-};
-
-export default class ChatsPage extends Block<ChatsPageProps> {
+class ChatsPage extends Block<ChatsPageProps> {
 
   messageForm: Form;
   sendButton: SendButton;
   router: Router;
+  addChatModal: Block;
+  chatsController: ChatsController;
 
   constructor(props?: ChatsPageProps) {
     super({
       ...props,
-      childrenList: { ...mockData },
+      modalMessage: new ModalMessage(),
+      loadingSpinner: new LoadingSpinner(),
+      addChatModal: new AddChatModal(),
 
       profileButton: new ArrowButton({
         text: 'Profile',
@@ -112,11 +48,18 @@ export default class ChatsPage extends Block<ChatsPageProps> {
           click: () => this.router.go('/settings')
         }
       }),
+      chatsListSidebar: new ChatsListSidebar(),
+      addButton: new AddButton({
+        events: {
+          click: () => store.set('chatsPage.createChatModal.visible', true)
+        }
+      }),
 
       messageForm: new Form({
         className: 'chats-page__dialog-area-reply-box-msg-form',
         ...props?.messageFormData,
         statePath: 'chatsPage.messageFormData',
+        onSubmit: () => this.messageSubmitted(),
         childrenList: {
           inputs: [
             new MessageInput()
@@ -124,28 +67,28 @@ export default class ChatsPage extends Block<ChatsPageProps> {
         }
       }),
 
-      sendButton: new SendButton()
+      sendButton: new SendButton({
+        events: {
+          click: () => this.messageForm.submit()
+        }
+      })
     });
 
     this.router = new Router();
+    this.chatsController = new ChatsController();
   }
 
   componentDidMount() {
     this.messageForm = this.children['messageForm'] as Form;
     this.sendButton = this.children['sendButton'] as SendButton;
+    this.addChatModal = this.children['addChatModal'];
 
-    this.messageForm.setProps({
-      onSubmit: () => this.messageSubmitted()
-    });
-    this.sendButton.setProps({
-      events: {
-        click: () => this.messageForm.submit()
-      }
-    });
+    this.chatsController.getChats({});
   }
 
   componentDidUpdate(oldProps: ChatsPageProps): boolean {
     this.messageForm.setProps({ ...this.props.messageFormData });
+    this.sendButton.setProps({ disabled: this.props.messageFormData?.disabled });
     return super.componentDidUpdate(oldProps);
   }
 
@@ -157,13 +100,14 @@ export default class ChatsPage extends Block<ChatsPageProps> {
     return `
     <div class="chats-page">
         <div class="chats-page__sidebar">
+          {{{modalMessage}}}
           <div class="chats-page__sidebar-header">
               {{{profileButton}}}
               <input type="text" placeholder="Search" class="chats-page__sidebar-header-search">
           </div>
-          <div class="chats-page__sidebar-chats-list">
-              {{{chatsList}}}
-          </div>
+          {{{chatsListSidebar}}}
+          {{{addButton}}}
+          {{{addChatModal}}}
         </div>
         <div class="chats-page__dialog-area">
             <header class="chats-page__dialog-area-header">
@@ -187,3 +131,7 @@ export default class ChatsPage extends Block<ChatsPageProps> {
     </div>`;
   }
 }
+
+const mapStateToProps = state => state.chatsPage;
+
+export default connect(mapStateToProps)(ChatsPage);

@@ -11,6 +11,7 @@ function connect<TProps extends blockProps>(mapStateToProps: (state: IAppState) 
 
         super({...props, ...state});
 
+        // rewrite to subscribe
         store.onUpdate(() => {
           const newState = mapStateToProps(store.getState()) ?? {};
 
