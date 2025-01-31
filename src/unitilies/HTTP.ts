@@ -37,7 +37,7 @@ class HTTP {
     }, options?.timeout);
   };
 
-  delete = (url: string, options: IHTTPOptions<null> = {}) => {
+  delete = <T>(url: string, options: IHTTPOptions<T> = {}) => {
     return this.request(url, {
       ...options,
       method: 'DELETE'
@@ -98,7 +98,7 @@ class HTTP {
     });
   };
 
-  requestWithRetry = <T>(url: string, options: { tries?: number } & IHTTPOptions<T> = {}) => {
+  requestWithRetry = <T>(url: string, options: { tries?: number } & IHTTPOptions<T> = {}): Promise<XMLHttpRequest> => {
     const { tries = 1 } = options;
 
     const onError = (err: Error) => {

@@ -1,12 +1,9 @@
 import './AddButton.pcss';
-import Button, { ButtonProps } from '../../../../components/Button';
+import Button from '../../../../components/Button';
+import { blockProps } from '../../../../framework/Block';
 
-interface AddButtonProps extends ButtonProps {
-  text?: string;
-}
-
-export default class AddButton extends Button<AddButtonProps> {
-  constructor(AddButtonProps?: AddButtonProps) {
+export default class AddButton extends Button {
+  constructor(AddButtonProps?: blockProps) {
     super({
       ...AddButtonProps,
       text: '',

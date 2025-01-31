@@ -2,8 +2,9 @@ import { EventBus } from './EventBus';
 import set from '../unitilies/set';
 import get from '../unitilies/get';
 import { IFormStateData } from '../components/Form';
-import { UserModel, ChatListItemModel } from '../types/data';
+import { UserModel, ChatListItemModel, MessageModel } from '../types/data';
 import isEqual from '../unitilies/isEqual';
+import { IModalState } from '../components/Modal';
 
 export enum StoreEvents {
   Updated = 'updated',
@@ -17,21 +18,28 @@ export interface IAppState {
     editAvatarFormData: IFormStateData,
     editProfileFormData: IFormStateData,
     editPasswordFormData: IFormStateData,
-    updateAvatarModal: {
-      formData: IFormStateData,
-      closable: boolean,
-      visible: boolean,
-    },
+    updateAvatarModal: IModalState,
     userData?: UserModel,
     editingPasswordMode: boolean,
     editingMode: boolean,
   },
   chatsPage: {
-    createChatModal: { formData: IFormStateData },
+    createChatModal: IModalState,
+    addUserModal: IModalState,
+    deleteUserModal: IModalState,
+    deleteChatModal: IModalState,
+    header: {
+      avatar: string | null,
+      name: string,
+      submenuOpened: boolean
+    },
     chatList: ChatListItemModel[] | null,
     selectedChat: number | null,
     token: string | null,
-    wsConnected: boolean
+    wsConnected: boolean,
+    dialogArea: {
+      messages: MessageModel[]
+    }
   },
   globalModalMessage: {
     title: string,
@@ -58,11 +66,23 @@ const initialState: IAppState = {
     editingMode: false,
   },
   chatsPage: {
-    createChatModal: { formData: { disabled: false } },
+    createChatModal: { formData: { disabled: false }, visible: false, closable: true },
+    addUserModal: { formData: { disabled: false }, visible: false, closable: true },
+    deleteUserModal: { formData: { disabled: false }, visible: false, closable: true },
+    deleteChatModal: { formData: { disabled: false }, visible: false, closable: true },
+    header: {
+      avatar: null,
+      name: '',
+      submenuOpened: false,
+    },
     chatList: null,
     selectedChat: null,
     token: null,
-    wsConnected: false
+    wsConnected: false,
+    dialogArea: {
+      messages: []
+    }
+
   },
   globalModalMessage: {
     title: '',
@@ -81,15 +101,15 @@ class Store {
     this.eventBus = new EventBus();
   }
 
-  public onUpdate(callback: (...args: unknown) => void) {
+  public onUpdate(callback: (...args: unknown[]) => void) {
     this.eventBus.on(StoreEvents.Updated, callback);
   }
 
   public subscribe(path: string, callback: (currentState: unknown) => void) {
-    let stateCache = get(this.getState(), path);
+    let stateCache = get(this.getState() as unknown as Record<string, unknown>, path);
 
     this.eventBus.on(StoreEvents.Updated, () => {
-      const currentState = get(this.getState(), path);
+      const currentState = get(this.getState() as unknown as Record<string, unknown>, path);
 
       if(!isEqual(stateCache, currentState)) {
         stateCache = currentState;
@@ -106,7 +126,7 @@ class Store {
     this.state = set(this.state, path, value) as IAppState;
 
     if (path === 'authorized'){
-      localStorage.setItem('authorized', value.toString()); // cache auth status
+      localStorage.setItem('authorized', (value as boolean).toString()); // cache auth status
     }
 
     this.eventBus.emit(StoreEvents.Updated);

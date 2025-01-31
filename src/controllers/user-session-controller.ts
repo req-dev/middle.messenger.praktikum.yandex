@@ -1,7 +1,9 @@
 import SessionApi from '../api/session-api';
 import store from '../framework/Store';
+import Router from '../framework/Router';
 
 const authApi = new SessionApi();
+const router = new Router();
 
 class UserSessionController {
   private static __instance: UserSessionController;
@@ -21,7 +23,7 @@ class UserSessionController {
           store.set('authorized', false);
           break;
         case 500:
-          alert('500 error'); // TODO fix
+          router.go('/500');
           break;
         case 200:
           store.set('authorized', true);
@@ -46,7 +48,7 @@ class UserSessionController {
 
       switch (result.status) {
         case 500:
-          alert('500 error'); // TODO fix
+          router.go('/500');
           break;
         case 200:
           store.set('authorized', false);

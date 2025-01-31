@@ -1,13 +1,14 @@
 import './UpdateAvatarButton.pcss';
 import Block, { blockProps } from '../../../../framework/Block';
 import connect from '../../../../framework/connectStore';
+import { IAppState } from '../../../../framework/Store';
 
 interface UpdateAvatarButtonProps extends blockProps {
-  avatar: string;
+  avatar?: string;
 }
 
 class UpdateAvatarButton extends Block<UpdateAvatarButtonProps> {
-  constructor(props: UpdateAvatarButtonProps) {
+  constructor(props?: UpdateAvatarButtonProps) {
     super({
       ...props,
       staticUrl: 'https://ya-praktikum.tech/api/v2/'
@@ -18,13 +19,13 @@ class UpdateAvatarButton extends Block<UpdateAvatarButtonProps> {
     this.updatePicture();
   }
 
-  componentDidUpdate(oldProps: UpdateAvatarButtonProps): boolean {
+  componentDidUpdate(): boolean {
     this.updatePicture();
     return false;
   }
 
   private updatePicture() {
-    const element = this.getContent().querySelector('.profile-page__body-avatar');
+    const element = this.getContent().querySelector('.profile-page__body-avatar') as HTMLElement;
     element.setAttribute('style', `background-image: url('https://ya-praktikum.tech/api/v2/resources${this.props.avatar}');`);
   }
 
@@ -37,6 +38,6 @@ class UpdateAvatarButton extends Block<UpdateAvatarButtonProps> {
   }
 }
 
-const mapStateToProps = state => state.profilePage.userData;
+const mapStateToProps = (state: IAppState) => state.profilePage.userData as unknown as Record<string, unknown>;
 
 export default connect(mapStateToProps)(UpdateAvatarButton);

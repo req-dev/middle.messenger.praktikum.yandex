@@ -4,11 +4,11 @@ import { Input } from '../../../../components/Input';
 import connect from '../../../../framework/connectStore';
 import Button from '../../../../components/Button';
 import ChatsController from '../../../../controllers/chats-controller';
-import { CreateChatRequest } from '../../../../types/data';
+import { CreateChatRequest } from '../../../../api/chats-api';
+import { IAppState } from '../../../../framework/Store';
 
 interface AddChatModalProps extends ModalProps {
-  title?: string;
-  formData?: IFormStateData
+  formData?: IFormStateData,
 }
 
 class AddChatModal extends Modal<AddChatModalProps> {
@@ -64,14 +64,14 @@ class AddChatModal extends Modal<AddChatModalProps> {
     this.form.validate();
   }
 
-  componentDidUpdate(oldProps: ModalProps): boolean {
+  componentDidUpdate(oldProps: AddChatModalProps): boolean {
     this.form.setProps({ ...this.props.formData })
     this.createButton.setProps({ loading: this.props.formData?.disabled });
     return super.componentDidUpdate(oldProps);
   }
 
   submitted() {
-    this.chatsController.createChat(this.form.getData() as CreateChatRequest)
+    this.chatsController.createChat(this.form.getData() as unknown as CreateChatRequest)
       .then((success) => {
       if (success) {
         // return the form to the initial state
@@ -83,6 +83,6 @@ class AddChatModal extends Modal<AddChatModalProps> {
 
 }
 
-const mapStateToProps = state => state.chatsPage.createChatModal;
+const mapStateToProps = (state: IAppState) => state.chatsPage.createChatModal as unknown as Record<string, unknown>;
 
 export default connect(mapStateToProps)(AddChatModal);

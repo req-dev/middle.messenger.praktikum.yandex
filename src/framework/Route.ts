@@ -19,36 +19,29 @@ export default class Route {
     this._props = props;
   }
 
-  navigate(pathname) {
-    if (this.match(pathname)) {
-      this._pathname = pathname;
-      this.render();
-    }
-  }
-
   leave() {
     if (this._block) {
       this._block.hide();
     }
   }
 
-  match(pathname) {
+  match(pathname: string) {
     return pathname === this._pathname;
   }
 
-  forceRerender() {
-    if (this._block) {
+  render(force: boolean = false) {
+    if (force && this._block) {
       this._block.dispatchComponentDestroy();
       this._block = null;
     }
-    this.render();
-    this._block.hide();
-  }
 
-  render() {
     if (!this._block) {
       this._block = new this._blockClass();
       render(this._props.rootQuery, this._block);
+
+      if (force) {
+        this._block.hide();
+      }
       return;
     }
 

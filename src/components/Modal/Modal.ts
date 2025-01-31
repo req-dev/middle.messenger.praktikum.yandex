@@ -2,9 +2,17 @@ import './Modal.pcss';
 import Block, { blockProps } from '../../framework/Block';
 import Button from '../Button';
 import store from '../../framework/Store';
+import { IFormStateData } from '../Form';
+
+// for using in Store
+export interface IModalState {
+  formData?: IFormStateData,
+  visible?: boolean,
+  closable?: boolean
+}
 
 export interface ModalProps extends blockProps {
-  title: string,
+  title?: string,
   bodyMessage?: string,
   childrenList?: { body: Block[]; } & Record<string, Block[]>,
   closable?: boolean,
@@ -14,12 +22,11 @@ export interface ModalProps extends blockProps {
   statePath?: string // if you specify this, modal will rely on global state
 }
 
-export class Modal<T extends ModalProps> extends Block<T> {
+export class Modal<T extends ModalProps = ModalProps> extends Block<T> {
 
-  visible: boolean;
   cancelButton: Button;
 
-  constructor(props: ModalProps) {
+  constructor(props: T) {
     super({
       ...props,
       className: 'modal__background',
@@ -37,8 +44,6 @@ export class Modal<T extends ModalProps> extends Block<T> {
         click: () => this.closeBkgClicked()
       }
     });
-
-    this.visible = Boolean(props.visible);
   }
 
   private modalClicked(e: Event) {
@@ -59,10 +64,9 @@ export class Modal<T extends ModalProps> extends Block<T> {
   }
 
   open() {
-    if (this.visible) {
+    if (this.props.visible) {
       return;
     }
-    this.visible = true;
 
     const { statePath } = this.props;
     if (statePath) {
@@ -73,10 +77,9 @@ export class Modal<T extends ModalProps> extends Block<T> {
   }
 
   close() {
-    if (!this.visible) {
+    if (!this.props.visible) {
       return;
     }
-    this.visible = false;
 
     const { statePath } = this.props;
     if (statePath) {
@@ -87,20 +90,20 @@ export class Modal<T extends ModalProps> extends Block<T> {
   }
 
   componentDidMount() {
-    this.cancelButton = this.children['cancelButton'] as Button;
+    this.cancelButton = this.children['cancelButton'] as unknown as Button;
 
     this.updateVisibility();
     this.addListener();
   }
 
-  componentDidUpdate(oldProps: ModalProps) {
+  componentDidUpdate(oldProps: T) {
     this.cancelButton.setProps({ disabled: !this.props.closable && !this.props.closableWithButton });
     this.updateVisibility();
     return super.componentDidUpdate(oldProps);
   }
 
   componentWillUnmount() {
-    const element = this.getContent().querySelector('.modal');
+    const element = this.getContent().querySelector('.modal') as HTMLElement;
     element.removeEventListener('click', this.modalClicked);
   }
 
@@ -117,7 +120,7 @@ export class Modal<T extends ModalProps> extends Block<T> {
   }
 
   private addListener() {
-    const element = this.getContent().querySelector('.modal');
+    const element = this.getContent().querySelector('.modal') as HTMLElement;
     element.addEventListener('click', this.modalClicked);
   }
 

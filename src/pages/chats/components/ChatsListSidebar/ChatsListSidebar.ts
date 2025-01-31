@@ -3,15 +3,16 @@ import connect from '../../../../framework/connectStore';
 import { ChatListItemModel } from '../../../../types/data';
 import ChatItem from '../../../../components/ChatItem';
 import isEqual from '../../../../unitilies/isEqual';
-import store from '../../../../framework/Store';
+import store, { IAppState } from '../../../../framework/Store';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 import DialogController from '../../../../controllers/dialog-controller';
+import formatDate from '../../../../unitilies/formatDate';
 
 interface ChatsListSidebarProps extends blockProps {
   chatList?: ChatListItemModel[] | null,
-  selectedChat: number | null,
-  childrenList: { chatsList: ChatItem[]; } & Record<string, Block[]>,
-  gotChats: boolean, // local state, if false shows spinner
+  selectedChat?: number | null,
+  childrenList?: { chatsList: ChatItem[]; } & Record<string, Block[]>,
+  gotChats?: boolean, // local state, if false shows spinner
 }
 
 class ChatsListSidebar extends Block<ChatsListSidebarProps> {
@@ -38,6 +39,7 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
   componentDidUpdate(oldProps: ChatsListSidebarProps): boolean {
     const chatList = this.props.chatList ?? [];
     const chatListChanged = !isEqual(oldProps.chatList ?? [], chatList);
+    const myUserId = store.getState().user?.id;
 
     if (Boolean(this.props.chatList) != this.props.gotChats) {
       this.setProps({ gotChats: Boolean(this.props.chatList) });
@@ -50,9 +52,9 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
         dialogs.push(new ChatItem({
           src: chatItem.avatar ?? 'https://avatar.iran.liara.run/public',
           name: chatItem.title,
-          datestamp: chatItem.last_message?.time ?? '', // TODO fix, should display time
+          datestamp: chatItem.last_message?.time ? formatDate(chatItem.last_message.time, 'DD.MM'): '',
           message: chatItem.last_message?.content ?? 'Chat has been created',
-          addMePrefix: false, // TODO fix with proper check
+          addMePrefix: Boolean(chatItem.last_message?.user == myUserId),
           counter: chatItem.unread_count,
           id: chatItem.id,
           selected: chatItem.id === this.props.selectedChat,
@@ -70,12 +72,26 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
     return super.componentDidUpdate(oldProps);
   }
 
-  chatClicked(id: number) {
-    store.set('chatsPage.selectedChat', id);
+  async chatClicked(id: number) {
+    if (!this.dialogController.canDisconnect || id === this.props.selectedChat) {
+      return;
+    }
+    const chatList = this.props.chatList ?? [];
+    const chat = chatList.find(el => el.id === id);
+
+    store.set('chatsPage', {
+      selectedChat: id,
+      header: {
+        avatar: chat?.avatar ?? null,
+        name: chat?.title ?? '',
+      }
+    });
     this.updateChatsSelecting();
+    await this.dialogController.disconnect();
+    await this.dialogController.createWSConnection(id);
   }
 
-  updateChatsSelecting() {
+  private updateChatsSelecting() {
     const selectedChat = this.props.selectedChat;
     const chatsList = this.props.childrenList?.chatsList ?? [];
 
@@ -95,6 +111,6 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
   }
 }
 
-const mapStateToProps = state => state.chatsPage;
+const mapStateToProps = (state: IAppState) => state.chatsPage as unknown as Record<string, unknown>;
 
 export default connect(mapStateToProps)(ChatsListSidebar);

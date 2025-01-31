@@ -1,9 +1,9 @@
-export default class BaseAPI {
-  create() { throw new Error('Not implemented'); }
+export default abstract class BaseAPI {
+  create(_data: unknown) { throw new Error('Not implemented'); }
 
-  request() { throw new Error('Not implemented'); }
+  request(_data: unknown) { throw new Error('Not implemented'); }
 
-  update() { throw new Error('Not implemented'); }
+  update(_data: unknown) { throw new Error('Not implemented'); }
 
-  delete() { throw new Error('Not implemented'); }
+  delete(_data: unknown) { throw new Error('Not implemented'); }
 }

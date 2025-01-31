@@ -1,6 +1,10 @@
 import { HTTP } from '../unitilies/HTTP';
 import BaseAPI from './base-api'
-import { LoginFormModel } from '../types/data';
+
+export interface LoginFormModel {
+  login: string;
+  password: string;
+}
 
 const loginAPIInstance = new HTTP('https://ya-praktikum.tech/api/v2/auth/signin');
 

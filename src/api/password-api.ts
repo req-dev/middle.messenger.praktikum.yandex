@@ -1,6 +1,10 @@
 import { HTTP } from '../unitilies/HTTP';
 import BaseAPI from './base-api'
-import { UpdatePasswordRequest } from '../types/data';
+
+export interface UpdatePasswordRequest {
+  oldPassword: string,
+  newPassword: string
+}
 
 const passwordAPIInstance = new HTTP('https://ya-praktikum.tech/api/v2/user/password');
 

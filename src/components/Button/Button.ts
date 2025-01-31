@@ -4,14 +4,14 @@ import Block, {blockProps} from '../../framework/Block';
 import LoadingSpinner from '../LoadingSpinner';
 
 export interface ButtonProps extends blockProps {
-  text: string,
+  text?: string,
   darkMode?: boolean,
   disabled?: boolean,
-  loading?: boolean,
+  loading?: boolean
 }
 
-export default class Button<T extends ButtonProps> extends Block<T>{
-  constructor(props: ButtonProps) {
+export default class Button<T extends ButtonProps = ButtonProps> extends Block<T>{
+  constructor(props: T) {
     const className = `button ${props.darkMode ? 'button_dark' : ''}`;
     super({
       ...props,
@@ -29,7 +29,7 @@ export default class Button<T extends ButtonProps> extends Block<T>{
     this.updateDisabledProperty();
   }
 
-  componentDidUpdate(oldProps: ButtonProps): boolean {
+  componentDidUpdate(oldProps: T): boolean {
     this.updateDisabledProperty();
     return super.componentDidUpdate(oldProps);
   }

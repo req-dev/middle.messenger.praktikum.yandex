@@ -1,7 +1,6 @@
 import Route from './Route';
 import Block from './Block';
 import store from './Store';
-import UserSessionController from '../controllers/user-session-controller';
 
 const pagesRequireAuth = ['/messenger', '/settings'];
 const authPages = ['/', '/sign-up'];
@@ -14,7 +13,6 @@ class Router {
   private history: History;
   private _currentRoute: Route | null;
   private _rootQuery: string;
-  private userSessionController: UserSessionController;
 
   constructor(rootQuery: string = '#app') {
     if (Router.__instance) {
@@ -26,10 +24,9 @@ class Router {
     this._currentRoute = null;
     this._rootQuery = rootQuery;
     this.authorized = false;
-    this.userSessionController = new UserSessionController();
 
     store.subscribe('authorized', () => {
-      this.stateChanged();
+      this.authStateChanged();
     })
 
     Router.__instance = this;
@@ -47,14 +44,14 @@ class Router {
     this.authorized = store.getState().authorized;
     // rerender when pathname is updated
     window.onpopstate = event => {
-      this._onRoute(event.currentTarget.location.pathname);
+      const target = event.currentTarget as Window;
+      this._onRoute(target.location.pathname);
     };
 
     this.go(window.location.pathname);
-    this.userSessionController.getUser();
   }
 
-  _onRoute(pathname) {
+  _onRoute(pathname: string) {
     let route = this.getRoute(pathname);
     if (!route) {
       route = this.getRoute('/404')!;
@@ -68,7 +65,7 @@ class Router {
     route.render();
   }
 
-  go(pathname) {
+  go(pathname: string) {
     // forbid redirect if an unauthorized user tries to go anywhere but allowed pages
     const redirectForbidden = this.authorized ? authPages.includes(pathname) : pagesRequireAuth.includes(pathname);
     if (redirectForbidden) {
@@ -79,8 +76,16 @@ class Router {
     this._onRoute(pathname);
   }
 
-  getRoute(pathname) {
+  getRoute(pathname: string) {
     return this.routes.find(route => route.match(pathname));
+  }
+
+  authStateChanged() {
+    this.authorized = store.getState().authorized;
+    if (this.authorized) {
+      this._rerenderAuthPages();
+    }
+    this.go(this.authorized ? '/messenger' : '/');
   }
 
   private _rerenderAuthPages() {
@@ -88,20 +93,11 @@ class Router {
     const settings = this.getRoute('/settings');
 
     if (messenger) {
-      messenger.forceRerender();
+      messenger.render(true);
     }
     if (settings) {
-      settings.forceRerender();
+      settings.render(true);
     }
-  }
-
-  stateChanged() {
-    const stateAuthorized = store.getState().authorized;
-    this.authorized = stateAuthorized;
-    if (stateAuthorized) {
-      this._rerenderAuthPages();
-    }
-    this.go(stateAuthorized ? '/messenger' : '/');
   }
 }
 

@@ -8,16 +8,18 @@ import UserSessionController from '../../controllers/user-session-controller';
 import UserAccountController from '../../controllers/user-account-controller';
 import connect from '../../framework/connectStore';
 import isEqual from '../../unitilies/isEqual';
-import { UserModel, UpdateProfileRequest, UpdatePasswordRequest } from '../../types/data';
-import store from '../../framework/Store';
+import { UserModel } from '../../types/data';
+import { UpdatePasswordRequest } from '../../api/password-api';
+import { UpdateProfileRequest } from '../../api/profile-api';
+import store, { IAppState } from '../../framework/Store';
 import UpdateModalAvatar from './components/UpdateAvatarModal';
 import UpdateAvatarButton from './components/UpdateAvatarButton';
 import ModalMessage from '../../components/ModalMessage';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface ProfilePageProps extends blockProps {
-  modalMessage: Block,
-  loadingSpinner: LoadingSpinner,
+  modalMessage?: Block,
+  loadingSpinner?: LoadingSpinner,
   updateAvatarButton?: Block,
   editProfileForm?: Form,
   editPasswordForm?: Form,
@@ -190,10 +192,10 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 
   componentDidMount() {
-    this.editProfileForm = this.children['editProfileForm'] as Form;
-    this.editPasswordForm = this.children['editPasswordForm'] as Form;
-    this.saveChangesButton = this.children['saveChangesButton'] as Button;
-    this.cancelButton = this.children['cancelButton'] as Button;
+    this.editProfileForm = this.children['editProfileForm'] as unknown as Form;
+    this.editPasswordForm = this.children['editPasswordForm'] as unknown as Form;
+    this.saveChangesButton = this.children['saveChangesButton'] as unknown as Button;
+    this.cancelButton = this.children['cancelButton'] as unknown as Button;
     this.updateAvatarModal = this.children['updateAvatarModal'];
 
 
@@ -229,7 +231,7 @@ class ProfilePage extends Block<ProfilePageProps> {
     this.cancelButton.setProps({ disabled: saveChangesButtonDisabled });
     this.editProfileForm.setProps({
       ...this.props?.editProfileFormData,
-      disabled: profileFormDisabled | !this.props.editingMode
+      disabled: profileFormDisabled || !this.props.editingMode
     });
     this.editPasswordForm.setProps({ ...this.props?.editPasswordFormData });
     return super.componentDidUpdate(oldProps);
@@ -267,11 +269,11 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 
   editProfileSubmitted(){
-    this.userAccountController.updateProfile(this.editProfileForm.getData() as UpdateProfileRequest);
+    this.userAccountController.updateProfile(this.editProfileForm.getData() as unknown as UpdateProfileRequest);
   }
 
   editPasswordSubmitted(){
-    this.userAccountController.updatePassword(this.editPasswordForm.getData() as UpdatePasswordRequest);
+    this.userAccountController.updatePassword(this.editPasswordForm.getData() as unknown as UpdatePasswordRequest);
   }
 
   render() {
@@ -320,6 +322,6 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 }
 
-const mapStateToProps = state => state.profilePage;
+const mapStateToProps = (state: IAppState) => state.profilePage as unknown as Partial<ProfilePageProps>;
 
-export default connect(mapStateToProps)(ProfilePage);
+export default connect<ProfilePageProps>(mapStateToProps)(ProfilePage);

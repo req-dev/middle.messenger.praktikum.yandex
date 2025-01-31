@@ -9,7 +9,6 @@ enum BlockEvents {
   FLOW_CDU = 'flow:component-did-update',
   FLOW_CWD = 'flow:component-will-destroy',
   FLOW_CWU = 'flow:component-will-unmount',
-  FLOW_CAU = 'flow:component-after-update',
   FLOW_RENDER = 'flow:render',
 }
 
@@ -30,15 +29,15 @@ abstract class Block<T extends blockProps = blockProps> {
 
   private _element: HTMLElement;
   private readonly _meta: { tagName: string, props: blockProps };
-  private visible: boolean;
+  private _visible: boolean;
   private _id = getRandomNumber();
   public props: T;
   public eventBus: () => EventBus;
   protected children: Record<string, Block<T>> = {};
   protected nestedChildren: Record<string, Block<T>> = {};
 
-  protected constructor(propsAndChildren: T, tagName: string = 'div') {
-    const getChildren = this._getChildren(propsAndChildren);
+  protected constructor(propsAndChildren?: T, tagName: string = 'div') {
+    const getChildren = this._getChildren(propsAndChildren ?? {} as unknown as T);
     const { children, nestedChildren } = getChildren;
     let { props } = getChildren;
     const eventBus = new EventBus();
@@ -46,7 +45,7 @@ abstract class Block<T extends blockProps = blockProps> {
     this.nestedChildren = nestedChildren;
 
     props = { ...props, __id: this._id };
-    this.visible = true;
+    this._visible = true;
     this._meta = {
       tagName,
       props,
@@ -65,7 +64,6 @@ abstract class Block<T extends blockProps = blockProps> {
     eventBus.on(BlockEvents.FLOW_CDU, this._componentDidUpdate.bind(this));
     eventBus.on(BlockEvents.FLOW_CWD, this._componentWillDestroy.bind(this));
     eventBus.on(BlockEvents.FLOW_CWU, this._componentWillUnmount.bind(this));
-    eventBus.on(BlockEvents.FLOW_CAU, this._componentAfterUpdate.bind(this));
     eventBus.on(BlockEvents.FLOW_RENDER, this._render.bind(this));
   }
 
@@ -189,7 +187,7 @@ abstract class Block<T extends blockProps = blockProps> {
         });
       }
 
-      this.eventBus().emit(BlockEvents.FLOW_CAU);
+      this.componentAfterUpdate();
     }
   }
 
@@ -197,10 +195,6 @@ abstract class Block<T extends blockProps = blockProps> {
   // if it returns true, block will rerender
   componentDidUpdate(oldProps: T): boolean {
     return !isEqual(oldProps, this.props);
-  }
-
-  private _componentAfterUpdate() {
-    this.componentAfterUpdate();
   }
 
   // user can override it
@@ -335,19 +329,19 @@ abstract class Block<T extends blockProps = blockProps> {
   }
 
   show() {
-    this.visible = true;
+    this._visible = true;
     this._applyVisible();
   }
 
   hide() {
-    this.visible = false;
+    this._visible = false;
     this._applyVisible();
   }
 
   private _applyVisible() {
     const element = this.getContent();
 
-    if (this.visible) {
+    if (this._visible) {
       const style = element.getAttribute('style');
 
       if (style) {

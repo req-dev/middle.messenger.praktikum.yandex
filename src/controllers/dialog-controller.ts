@@ -2,61 +2,180 @@ import store from '../framework/Store';
 import Router from '../framework/Router';
 import ChatTokenApi from '../api/chat-token-api';
 
+type ServerWSResponse = { type: string } & Record<string, unknown>
+
 const chatTokenApi = new ChatTokenApi();
 const router = new Router();
 
 class DialogController {
   private static __instance: DialogController;
-  ws: WebSocket | null;
+  private ws: WebSocket | null;
+  private _disconnecting: boolean;
+  private keepConnectionId: number | null;
 
   constructor() {
     if (DialogController.__instance) {
       return DialogController.__instance;
     }
-    store.subscribe('chatsPage.selectedChat', (selectedChat: number | null) => {
-      if (selectedChat) {
-        this.createWSConnection(selectedChat);
-      }
-    });
     this.ws = null;
+    this._disconnecting = false;
+    this.keepConnectionId = null;
 
     DialogController.__instance = this;
   }
 
-  private async createWSConnection(id: number) {
+  get canConnect(): boolean {
+    return !this._disconnecting && this.keepConnectionId === null || this.ws === null;
+  }
+
+  get canDisconnect(): boolean {
+    return !this._disconnecting;
+  }
+
+  async createWSConnection(id: number) {
+    if (!this.canConnect) {
+      alert('can not create connection');
+      return;
+    }
     const token = await this.getWsToken(id);
     const userId = store.getState().user?.id;
     const chatId = store.getState().chatsPage.selectedChat;
 
     if (!token || !userId || !chatId) {
       store.set('chatsPage.selectedChat', null);
+      if (this.canDisconnect) {
+        await this.disconnect();
+      }
+      throw new Error('Fatal error: can not proceed any further. token, userId and chatId can not be null.');
+    }
+    if (this.ws) {
+      store.set('chatsPage.selectedChat', null);
+      if (this.canDisconnect) {
+        await this.disconnect();
+      }
       return;
     }
 
-    console.log(`Trying to connect to wss://ya-praktikum.tech/ws/chats/${userId}/${chatId}/${token}`)
     this.ws = new WebSocket(`wss://ya-praktikum.tech/ws/chats/${userId}/${chatId}/${token}`);
 
     this.ws.addEventListener('open', () => {
-      console.log('WS connected');
+      this.enableKeepConnection();
+      store.set('chatsPage.wsConnected', true);
+
+      // get unread messages after connected
+      this.sendData({
+        content: "0",
+        type: "get old"
+      });
     });
 
-    this.ws.addEventListener('close', event => {
-      if (event.wasClean) {
-        console.log('Connection closed by on of the members');
-      } else {
-        console.log('Connection closed unexpectedly');
+    this.ws.addEventListener('close', async (event) => {
+      if (this.canDisconnect) {
+        await this.disconnect();
       }
 
-      console.log(`Code: ${event.code} | Reason: ${event.reason}`);
+      if (event.wasClean) {
+        return;
+      }
+
+      console.log(`Connection closed unexpectedly, Code: ${event.code} | Reason: ${event.reason}`);
+      store.set('globalModalMessage', {
+        title: 'Network Error',
+        bodyMessage: `Could not connect to the chat, check your internet connection and try again. Code: ${event.code} | Reason: ${event.reason}`,
+        visible: true,
+      });
     });
 
     this.ws.addEventListener('message', event => {
-      console.log('Received data', event.data);
+      this.receivedData(JSON.parse(event.data));
     });
+  }
 
-    this.ws.addEventListener('error', event => {
-      console.log('Error', event.message);
+  private receivedData(data: ServerWSResponse | ServerWSResponse[]) {
+    if (Array.isArray(data)) {
+      // list of messages
+      store.set('chatsPage.dialogArea.messages', [ ...store.getState().chatsPage.dialogArea.messages, ...data ]);
+    } else {
+      switch (data.type) {
+        case 'pong':
+          console.log('pong');
+          break;
+        case 'message':
+        case 'sticker':
+        case 'file':
+          store.set('chatsPage.dialogArea.messages', [ ...store.getState().chatsPage.dialogArea.messages, data ]);
+          break;
+      }
+    }
+  }
+
+  public sendData(data: Record<string, unknown>): boolean {
+    if (this._disconnecting || this.keepConnectionId === null || this.ws === null) {
+      return false;
+    }
+    this.ws.send(JSON.stringify(data));
+    return true;
+  }
+
+  disconnect() {
+    return new Promise((resolve, reject) => {
+      if (!this.canDisconnect) {
+        reject(new Error('WS is already disconnecting, can not disconnect twice'));
+      }
+
+      this._disconnecting = true;
+      this.disableKeepConnection();
+      store.set('chatsPage.dialogArea.messages', []);
+      if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
+        store.set('chatsPage', {
+          wsConnected: false,
+          token: null,
+          dialogArea: {
+            messages: []
+          }
+        });
+        this.ws = null;
+        this._disconnecting = false;
+        resolve('disconnected');
+        return;
+      }
+
+      this.ws.addEventListener('close', () => {
+        if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
+          this.ws = null;
+          this._disconnecting = false;
+          store.set('chatsPage', {
+            wsConnected: false,
+            token: null,
+            dialogArea: {
+              messages: []
+            }
+          });
+          resolve('disconnected');
+        }
+      });
+
+      if (this.ws.readyState !== WebSocket.CLOSING) {
+        this.ws.close();
+      }
     });
+  }
+
+  private enableKeepConnection() {
+    this.keepConnectionId = setInterval(() => {
+      if (this.ws) {
+        this.ws.send(JSON.stringify({type: "ping"}));
+      } else {
+        this.disableKeepConnection();
+      }
+    }, 6000) as unknown as number;
+  }
+
+  private disableKeepConnection() {
+    if (this.keepConnectionId) {
+      clearInterval(this.keepConnectionId);
+      this.keepConnectionId = null;
+    }
   }
 
   private async getWsToken(id: number) {

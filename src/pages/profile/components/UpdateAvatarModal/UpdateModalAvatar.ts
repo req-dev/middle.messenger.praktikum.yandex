@@ -4,9 +4,9 @@ import { Input } from '../../../../components/Input';
 import connect from '../../../../framework/connectStore';
 import Button from '../../../../components/Button';
 import UserAccountController from '../../../../controllers/user-account-controller';
+import { IAppState } from '../../../../framework/Store';
 
 interface UpdateModalAvatarProps extends ModalProps {
-  title?: string;
   formData?: IFormStateData
 }
 
@@ -68,7 +68,7 @@ class UpdateModalAvatar extends Modal<UpdateModalAvatarProps> {
     this.form.validate();
   }
 
-  componentDidUpdate(oldProps: ModalProps): boolean {
+  componentDidUpdate(oldProps: UpdateModalAvatarProps): boolean {
     this.form.setProps({ ...this.props.formData })
     this.applyButton.setProps({ loading: this.props.formData?.disabled });
     return super.componentDidUpdate(oldProps);
@@ -80,6 +80,6 @@ class UpdateModalAvatar extends Modal<UpdateModalAvatarProps> {
 
 }
 
-const mapStateToProps = state => state.profilePage.updateAvatarModal;
+const mapStateToProps = (state: IAppState) => state.profilePage.updateAvatarModal as unknown as Record<string, unknown>;
 
 export default connect(mapStateToProps)(UpdateModalAvatar);

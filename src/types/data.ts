@@ -9,10 +9,6 @@ export interface UserModel {
   email: string
 }
 
-export interface CreateChatRequest {
-  title: string
-}
-
 export interface ChatListItemModel {
   id: number,
   title: string,
@@ -33,36 +29,19 @@ export interface ChatListItemModel {
   }
 }
 
-export interface GetChatsRequest {
-  offset?: number,
-  limit?: number,
-  title?: string
-}
-
-export interface UpdateProfileRequest {
-  first_name: string,
-  second_name: string,
-  display_name: string,
-  login: string,
-  email: string,
-  phone: string
-}
-
-export interface UpdatePasswordRequest {
-  oldPassword: string,
-  newPassword: string
-}
-
-export interface LoginFormModel {
-  login: string;
-  password: string;
-}
-
-export interface SignupFormModel {
-  email: string,
-  login: string,
-  first_name: string,
-  second_name: string,
-  phone: string
-  password: string,
+export interface MessageModel {
+  chat_id: number,
+  time: string,
+  type: string,
+  user_id: string,
+  content: string,
+  file?: {
+    id: number,
+    user_id: number,
+    path: string,
+    filename: string,
+    content_type: string,
+    content_size: number,
+    upload_date: string,
+  }
 }

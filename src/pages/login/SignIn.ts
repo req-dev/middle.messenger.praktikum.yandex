@@ -6,11 +6,12 @@ import Form, { IFormStateData } from '../../components/Form';
 import connect from '../../framework/connectStore';
 import Router from '../../framework/Router';
 import UserLoginController from '../../controllers/user-login-controller';
-import { LoginFormModel } from '../../types/data';
+import { LoginFormModel } from '../../api/login-api';
 import ModalMessage from '../../components/ModalMessage';
+import { IAppState } from '../../framework/Store';
 
 interface SignInProps extends blockProps{
-  modalMessage: Block,
+  modalMessage?: Block,
   ModalTitle?: ModalTitle,
   form?: Form,
   SignInBtn?: Button,
@@ -79,9 +80,9 @@ class SignInPage extends Block<SignInProps> {
   }
 
   componentDidMount() {
-    this.form = this.children['form'] as Form;
-    this.signInBtn = this.children['SignInBtn'] as Button;
-    this.signUpBtn = this.children['SignUpBtn'] as Button;
+    this.form = this.children['form'] as unknown as Form;
+    this.signInBtn = this.children['SignInBtn'] as unknown as Button;
+    this.signUpBtn = this.children['SignUpBtn'] as unknown as Button;
 
     this.form.setProps({
       onSubmit: () => this.submitted()
@@ -101,7 +102,7 @@ class SignInPage extends Block<SignInProps> {
   }
 
   submitted(){
-    this.userLoginController.login(this.form.getData() as LoginFormModel);
+    this.userLoginController.login(this.form.getData() as unknown as LoginFormModel);
   }
 
   render() {
@@ -119,6 +120,6 @@ class SignInPage extends Block<SignInProps> {
   }
 }
 
-const mapStateToProps = state => state.signinPage;
+const mapStateToProps = (state: IAppState) => state.signinPage;
 
-export default connect(mapStateToProps)(SignInPage);
+export default connect<SignInProps>(mapStateToProps)(SignInPage);

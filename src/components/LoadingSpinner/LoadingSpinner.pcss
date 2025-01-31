@@ -1,20 +1,20 @@
 .spinner {
-    width: 100%;
     display: flex;
+    width: 100%;
 }
 
 .spinner__svg {
+    height: 24px;
     margin: auto;
     width: 24px;
-    height: 24px;
 }
 
 .spinner__svg-path {
-    transform-origin: center;
-    animation: spinner__icon_animation .75s infinite linear
+    animation: spinner-icon-animation .75s infinite linear;
+    transform-origin: center
 }
 
-@keyframes spinner__icon_animation {
+@keyframes spinner-icon-animation {
     100% {
         transform: rotate(360deg)
     }

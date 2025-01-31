@@ -1,8 +1,7 @@
-import LoginApi from '../api/login-api';
+import LoginApi, { LoginFormModel } from '../api/login-api';
 import store from '../framework/Store';
 import Router from '../framework/Router';
 import UserSessionController from './user-session-controller';
-import { LoginFormModel } from '../types/data';
 
 const loginApi = new LoginApi();
 const router = new Router();

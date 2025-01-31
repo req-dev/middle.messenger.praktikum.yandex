@@ -3,18 +3,16 @@ import ModalTitle from '../../components/ModalTitle';
 import Form, { IFormStateData } from '../../components/Form';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { SignupFormModel } from '../../types/data';
+import { SignupFormModel } from '../../api/signup-api';
 import UserSignupController from '../../controllers/user-signup-controller';
-import getRandomNumber from '../../unitilies/getRandomNumber';
 
 import connect from '../../framework/connectStore';
 import Router from '../../framework/Router';
 import ModalMessage from '../../components/ModalMessage';
-
-const randomPassword = `a${getRandomNumber()}cA1`;
+import { IAppState } from '../../framework/Store';
 
 interface SignUpProps extends blockProps{
-  modalMessage: Block,
+  modalMessage?: Block,
   ModalTitle?: ModalTitle,
   form?: Form,
   SignInBtn?: Button,
@@ -48,7 +46,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: 'pochta@yandex.ru',
               name: 'email',
               id: 'emailInput',
-              value: `a${getRandomNumber()}@gmail.com`
             }),
             new Input({
               hint: 'Login',
@@ -56,7 +53,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: 'ivanivanov',
               name: 'login',
               id: 'loginInput',
-              value: `a${getRandomNumber()}`
             }),
             new Input({
               hint: 'First name',
@@ -64,7 +60,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: 'ivan',
               name: 'first_name',
               id: 'firstNameInput',
-              value: 'Alex'
             }),
             new Input({
               hint: 'Second name',
@@ -72,7 +67,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: 'ivanov',
               name: 'second_name',
               id: 'secondNameInput',
-              value: 'Alexeev'
             }),
             new Input({
               hint: 'Phone',
@@ -80,7 +74,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: '+7 (909) 967 30 30',
               name: 'phone',
               id: 'phoneInput',
-              value: `+7${getRandomNumber()}`
             }),
             new Input({
               hint: 'Password',
@@ -88,7 +81,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: '••••••••••••',
               name: 'password',
               id: 'passwordInput',
-              value: randomPassword
             }),
             new Input({
               hint: 'Password again',
@@ -96,7 +88,6 @@ class SignUpPage extends Block<SignUpProps> {
               placeholder: '•••••••••••',
               name: 'password_repeat',
               id: 'passwordAgainInput',
-              value: randomPassword
             }),
           ]
         }
@@ -124,9 +115,9 @@ class SignUpPage extends Block<SignUpProps> {
   }
 
   componentDidMount() {
-    this.form = this.children['form'] as Form;
-    this.signInBtn = this.children['SignInBtn'] as Button;
-    this.signUpBtn = this.children['SignUpBtn'] as Button;
+    this.form = this.children['form'] as unknown as Form;
+    this.signInBtn = this.children['SignInBtn'] as unknown as Button;
+    this.signUpBtn = this.children['SignUpBtn'] as unknown as Button;
 
     this.form.setProps({
       onSubmit: () => this.submitted()
@@ -146,7 +137,7 @@ class SignUpPage extends Block<SignUpProps> {
   }
 
   submitted(){
-    this.userSignupController.signup(this.form.getData() as SignupFormModel);
+    this.userSignupController.signup(this.form.getData() as unknown as SignupFormModel);
 
   }
 
@@ -165,6 +156,6 @@ class SignUpPage extends Block<SignUpProps> {
   }
 }
 
-const mapStateToProps = state => state.signupPage;
+const mapStateToProps = (state: IAppState) => state.signupPage;
 
-export default connect(mapStateToProps)(SignUpPage);
+export default connect<SignUpProps>(mapStateToProps)(SignUpPage);

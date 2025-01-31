@@ -1,15 +1,10 @@
 import Modal, { ModalProps } from '../../components/Modal';
 import connect from '../../framework/connectStore';
 import Button from '../../components/Button';
+import { IAppState } from '../../framework/Store';
 
-interface ModalMessageProps extends ModalProps {
-  title?: string;
-  bodyMessage?: string;
-  visible?: boolean;
-}
-
-class ModalMessage extends Modal<ModalMessageProps> {
-  constructor(props?: ModalMessageProps) {
+class ModalMessage extends Modal {
+  constructor(props?: ModalProps) {
     super({
       ...props,
       title: props?.title ?? '',
@@ -18,7 +13,7 @@ class ModalMessage extends Modal<ModalMessageProps> {
       childrenList: {
         body: [
           new Button({
-            text: 'OK, I got it',
+            text: 'OK, got it',
             events: {
               click: () => this.close()
             }
@@ -30,6 +25,6 @@ class ModalMessage extends Modal<ModalMessageProps> {
 
 }
 
-const mapStateToProps = state => state.globalModalMessage;
+const mapStateToProps = (state: IAppState) => state.globalModalMessage as unknown as Partial<ModalProps>;
 
-export default connect(mapStateToProps)(ModalMessage);
+export default connect<ModalProps>(mapStateToProps)(ModalMessage);

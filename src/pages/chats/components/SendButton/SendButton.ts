@@ -1,12 +1,9 @@
 // language=hbs
-import Button, { ButtonProps } from '../../../../components/Button';
-
-interface SendButtonProps extends ButtonProps {
-  text?: string;
-}
+import Button from '../../../../components/Button';
+import { blockProps } from '../../../../framework/Block';
 
 export default class SendButton extends Button{
-  constructor(props?: SendButtonProps) {
+  constructor(props?: blockProps) {
     super({
       ...props,
       text: '',

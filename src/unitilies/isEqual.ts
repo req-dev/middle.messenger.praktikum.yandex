@@ -5,11 +5,11 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     && Object.prototype.toString.call(value) === '[object Object]';
 }
 
-function isArray(value: unknown): value is [] {
+function isArray(value: unknown): value is unknown[] {
   return Array.isArray(value);
 }
 
-function isArrayOrObject(value: unknown): value is ([] | Record<string, unknown>) {
+function isArrayOrObject(value: unknown): value is (Record<string | number, unknown>) {
   return isPlainObject(value) || isArray(value);
 }
 
@@ -27,7 +27,7 @@ function isEqual(a: unknown, b: unknown): boolean {
 
     if(isArrayOrObject(value) && isArrayOrObject(b[key])){
 
-      if (!isEqual(value as Record<string, unknown>, b[key] as Record<string, unknown>)) { // objects comparing
+      if (!isEqual(value, b[key])) { // objects comparing
         return false;
       }
 
