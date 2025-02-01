@@ -19,7 +19,7 @@ export interface blockProps extends Record<string, unknown>{
   attr?: { class?: string, listid?: string, belongsToList?: string } & Record<string, string>,
   settings?: {
     withInternalID?: boolean,
-    targetElementForEvents?: string,
+    targetElementForEvents?: string, // all the events will be attached to that element
     excludedAttributes?: string[], // list of attributes that will not be affected while rerender
   }
   __id?: number
@@ -182,9 +182,9 @@ abstract class Block<T extends blockProps = blockProps> {
 
       if (nestedChildrenUpdated) {
         // finishing mounting new nestedChildren
-        Object.values(this.nestedChildren).forEach((child) => {
+        for (const child of Object.values(this.nestedChildren)) {
           child.dispatchComponentDidMount();
-        });
+        }
       }
 
       this.componentAfterUpdate();
