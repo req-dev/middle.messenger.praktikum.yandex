@@ -187,8 +187,9 @@ class ProfilePage extends Block<ProfilePageProps> {
       })
     });
 
-    this.userSessionController = new UserSessionController();
     this.userAccountController = new UserAccountController();
+    this.userSessionController = new UserSessionController();
+    this.userSessionController.getUser();
   }
 
   componentDidMount() {
