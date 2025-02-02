@@ -9,6 +9,7 @@ import UserLoginController from '../../controllers/user-login-controller';
 import { LoginFormModel } from '../../api/login-api';
 import ModalMessage from '../../components/ModalMessage';
 import { IAppState } from '../../framework/Store';
+import UserSessionController from '../../controllers/user-session-controller';
 
 interface SignInProps extends blockProps{
   modalMessage?: Block,
@@ -26,6 +27,7 @@ class SignInPage extends Block<SignInProps> {
   signUpBtn: Button;
   router: Router;
   userLoginController: UserLoginController;
+  userSessionController: UserSessionController;
 
   constructor(props?: SignInProps) {
     super({
@@ -77,6 +79,8 @@ class SignInPage extends Block<SignInProps> {
 
     this.router = new Router();
     this.userLoginController = new UserLoginController();
+    this.userSessionController = new UserSessionController();
+    this.userSessionController.getUser();
   }
 
   componentDidMount() {
