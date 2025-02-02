@@ -7,10 +7,10 @@ interface ModalTitleProps extends blockProps {
 
 export default class ModalTitle extends Block<ModalTitleProps>{
   constructor(props: ModalTitleProps) {
-    super('h1', {
+    super({
       ...props,
       className: 'modal-title'
-    });
+    }, 'h1');
   }
 
   render() {

@@ -15,7 +15,18 @@ export default class TableInput extends Input{
   }
 
   render() {
-    return `<label for="{{id}}" class="profile-page__body-card-item-property-label">{{hint}}</label>
-            <input type="{{type}}" id="{{id}}" name="{{name}}" placeholder="{{placeholder}}" value="{{value}}" title="{{errorText}}" class="profile-page__body-card-item-property-input{{#if errorText}} profile-page__body-card-item-property-input_red{{/if}}">`;
+    return `<div class="profile-page__body-card-item-property-container">
+                <label for="{{id}}" class="profile-page__body-card-item-property-label">{{hint}}</label>
+                {{#if errorText}}
+                    <label class="input__error">{{errorText}}</label>
+                {{/if}}
+            </div>
+            <input type="{{type}}"
+                   id="{{id}}"
+                   name="{{name}}"
+                   placeholder="{{placeholder}}"
+                   value="{{value}}"
+                   {{#if disabled}}disabled="true"{{/if}}
+                   class="profile-page__body-card-item-property-input{{#if errorText}} profile-page__body-card-item-property-input_red{{/if}}">`;
   }
 }
