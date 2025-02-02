@@ -20,14 +20,10 @@
 
 ### Страницы приложения
 
-* [/login](https://yp-messr.netlify.app/login)
-* [/signup](https://yp-messr.netlify.app/signup)
-* [/chats](https://yp-messr.netlify.app/chats)
-* [/profile](https://yp-messr.netlify.app/profile)
-* [/500](https://yp-messr.netlify.app/500)
-* [/404](https://yp-messr.netlify.app/404)
-
-Также в приложении реализован роутинг для навигации по страницам при `нажатии стрелки вверх` или `кнопки пробела`
+* [/](https://yp-messr.netlify.app/)
+* [/sign-up](https://yp-messr.netlify.app/sign-up)
+* [/messenger](https://yp-messr.netlify.app/messenger)
+* [/settings](https://yp-messr.netlify.app/settings)
 
 ### Команды
 
