@@ -1,10 +1,12 @@
 // language=hbs
-import Block, { blockProps } from '../../../../framework/Block';
+import Button from '../../../../components/Button';
+import { blockProps } from '../../../../framework/Block';
 
-export default class SendButton extends Block<blockProps>{
+export default class SendButton extends Button{
   constructor(props?: blockProps) {
-    super('button', {
+    super({
       ...props,
+      text: '',
       className: 'chats-page__dialog-area-reply-box-send-btn'
     });
   }

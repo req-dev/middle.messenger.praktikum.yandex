@@ -1,6 +1,6 @@
-import ErrorPage from './error';
+import { Error404, Error500 } from './error';
 
-export { ErrorPage };
+export { Error404, Error500 };
 
 export { SignInPage, SignUpPage } from './login';
 

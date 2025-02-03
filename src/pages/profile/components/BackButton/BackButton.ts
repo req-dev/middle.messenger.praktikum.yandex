@@ -3,10 +3,10 @@ import Block, { blockProps } from '../../../../framework/Block';
 
 export default class BackButton extends Block{
   constructor(props?: blockProps) {
-    super('button', {
+    super({
       ...props,
       className: 'profile-page__back-btn'
-    });
+    }, 'button');
   }
   render() {
     return `<div class="profile-page__back-btn-icon">

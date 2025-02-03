@@ -1,0 +1,53 @@
+.chats-page__dialog-area-msgs-message-container {
+    display: flex;
+    margin: 5px 0;
+}
+
+.chats-page__dialog-area-msgs-message {
+    align-items: end;
+    background-color: var(--color-near-bkg);
+    border-radius: 12px;
+    display: flex;
+    margin-right: auto;
+    max-width: 650px;
+    padding: 11px;
+}
+
+.chats-page__dialog-area-msgs-message_from-me {
+    background-color: var(--color-accent-element);
+    margin-left: auto;
+    margin-right: unset;
+}
+
+.chats-page__dialog-area-msgs-message-text {
+    color: #fff;
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 150%;
+}
+
+.chats-page__dialog-area-msgs-message-read-mark {
+    display: none;
+    height: 4px;
+    margin-left: 14px;
+}
+
+.chats-page__dialog-area-msgs-message_from-me .chats-page__dialog-area-msgs-message-read-mark {
+    display: block;
+}
+
+.chats-page__dialog-area-msgs-message-date {
+    color: var(--color-non-accent-text);
+    font-family: Inter, sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 100%;
+    margin-left: 14px;
+    text-align: right;
+}
+
+.chats-page__dialog-area-msgs-message_from-me .chats-page__dialog-area-msgs-message-date {
+    color: var(--color-accent);
+    margin-left: 4px;
+}

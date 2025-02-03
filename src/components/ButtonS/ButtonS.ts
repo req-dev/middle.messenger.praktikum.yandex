@@ -7,10 +7,10 @@ interface ButtonProps extends blockProps {
 
 export default class Button extends Block<ButtonProps>{
   constructor(props: ButtonProps) {
-    super('button', {
+    super({
       ...props,
       className: 'button-small'
-    });
+    }, 'button');
   }
   render() {
     return `{{text}}`;
