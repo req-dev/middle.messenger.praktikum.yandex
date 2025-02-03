@@ -1,5 +1,5 @@
 import store from '../framework/Store';
-import Router from '../framework/Router';
+import Router, { Routes } from '../framework/Router';
 import ChatTokenApi from '../api/chat-token-api';
 
 type ServerWSResponse = { type: string } & Record<string, unknown>
@@ -188,7 +188,7 @@ class DialogController {
           store.set('authorized', false);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           store.set('chatsPage.token', tokenRequest.response.token);

@@ -1,6 +1,6 @@
 import LoginApi, { LoginFormModel } from '../api/login-api';
 import store from '../framework/Store';
-import Router from '../framework/Router';
+import Router, { Routes } from '../framework/Router';
 import UserSessionController from './user-session-controller';
 
 const loginApi = new LoginApi();
@@ -31,7 +31,7 @@ class UserLoginController {
           store.set('signinPage.FormStateData.generalFormError', result.response.reason);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           await userAuthController.getUser();

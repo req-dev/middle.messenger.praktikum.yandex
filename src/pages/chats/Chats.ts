@@ -3,7 +3,7 @@ import Block, { blockProps } from '../../framework/Block';
 import Form, { IFormStateData } from '../../components/Form';
 import MessageInput from './components/MessageInput';
 import SendButton from './components/SendButton';
-import Router from '../../framework/Router';
+import Router, { Routes } from '../../framework/Router';
 import ArrowButton from '../../components/ArrowButton';
 import ModalMessage from '../../components/ModalMessage';
 import ChatsController from '../../controllers/chats-controller';
@@ -58,7 +58,7 @@ class ChatsPage extends Block<ChatsPageProps> {
       profileButton: new ArrowButton({
         text: 'Profile',
         events: {
-          click: () => this.router.go('/settings')
+          click: () => this.router.go(Routes.Settings)
         }
       }),
       chatsListSidebar: new ChatsListSidebar(),
