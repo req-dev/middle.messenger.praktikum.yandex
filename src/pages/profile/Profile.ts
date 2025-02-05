@@ -323,6 +323,6 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 }
 
-const mapStateToProps = (state: IAppState) => state.profilePage as unknown as Partial<ProfilePageProps>;
+const mapStateToProps = (state: IAppState) => state.profilePage;
 
 export default connect<ProfilePageProps>(mapStateToProps)(ProfilePage);

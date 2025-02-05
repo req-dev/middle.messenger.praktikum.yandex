@@ -111,6 +111,6 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
   }
 }
 
-const mapStateToProps = (state: IAppState) => state.chatsPage as unknown as Record<string, unknown>;
+const mapStateToProps = (state: IAppState) => state.chatsPage;
 
 export default connect(mapStateToProps)(ChatsListSidebar);

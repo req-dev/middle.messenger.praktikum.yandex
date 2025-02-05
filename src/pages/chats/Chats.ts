@@ -164,6 +164,6 @@ class ChatsPage extends Block<ChatsPageProps> {
   }
 }
 
-const mapStateToProps = (state: IAppState) => state.chatsPage as Partial<ChatsPageProps>;
+const mapStateToProps = (state: IAppState) => state.chatsPage;
 
 export default connect<ChatsPageProps>(mapStateToProps)(ChatsPage);

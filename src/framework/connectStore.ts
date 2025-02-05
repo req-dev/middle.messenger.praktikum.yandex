@@ -2,7 +2,7 @@ import Block, { blockProps } from './Block';
 import store, { IAppState } from './Store';
 import isEqual from '../unitilies/isEqual';
 
-function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAppState) => Partial<P> | undefined) {
+function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAppState) => unknown) {
   return function(Component: typeof Block<P>) {
     return class extends Component {
       constructor(...args: P[]) {
