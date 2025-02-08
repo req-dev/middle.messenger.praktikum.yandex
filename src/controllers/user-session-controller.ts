@@ -1,7 +1,8 @@
 import SessionApi from '../api/session-api';
-import store from '../framework/Store';
+import Store from '../framework/Store';
 import Router, { Routes } from '../framework/Router';
 
+const store = new Store();
 const authApi = new SessionApi();
 const router = new Router();
 

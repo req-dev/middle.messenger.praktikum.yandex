@@ -1,10 +1,11 @@
 import ProfileApi, { UpdateProfileRequest } from '../api/profile-api';
 import PasswordApi, { UpdatePasswordRequest } from '../api/password-api';
-import store from '../framework/Store';
+import Store from '../framework/Store';
 import Router, { Routes } from '../framework/Router';
 import { UserModel } from '../types/data';
 import AvatarApi from '../api/avatar-api';
 
+const store = new Store();
 const profileApi = new ProfileApi();
 const passwordApi = new PasswordApi();
 const avatarApi = new AvatarApi();

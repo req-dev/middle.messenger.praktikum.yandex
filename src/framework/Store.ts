@@ -97,14 +97,20 @@ const initialState: IAppState = {
 };
 
 class Store {
+  private static __instance: Store;
   private state: IAppState;
   private eventBus: EventBus;
   private subscribed: boolean;
 
   constructor() {
+    if (Store.__instance) {
+      return Store.__instance;
+    }
+
     this.state = initialState;
     this.eventBus = new EventBus();
     this.subscribed = false;
+    Store.__instance = this;
   }
 
   public subscribe(path: string, callback: (currentState: unknown) => void) {
@@ -139,4 +145,4 @@ class Store {
   }
 }
 
-export default new Store();
+export default Store;

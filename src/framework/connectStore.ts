@@ -1,6 +1,8 @@
 import Block, { blockProps } from './Block';
-import store, { IAppState } from './Store';
+import Store, { IAppState } from './Store';
 import isEqual from '../unitilies/isEqual';
+
+const store = new Store();
 
 function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAppState) => unknown) {
   return function(Component: typeof Block<P>) {

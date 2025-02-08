@@ -1,8 +1,10 @@
 import SignupApi, { SignupFormModel } from '../api/signup-api';
-import store from '../framework/Store';
+import Store from '../framework/Store';
 import Router, { Routes } from '../framework/Router';
 import UserSessionController from './user-session-controller';
 
+
+const store = new Store();
 const signupApi = new SignupApi();
 const router = new Router();
 const userAuthController = new UserSessionController();

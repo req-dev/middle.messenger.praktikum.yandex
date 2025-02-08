@@ -1,4 +1,4 @@
-import store from '../framework/Store';
+import Store from '../framework/Store';
 import Router, { Routes } from '../framework/Router';
 import ChatsApi, { GetChatsRequest, DeleteChatRequest, CreateChatRequest } from '../api/chats-api';
 import DialogController from './dialog-controller';
@@ -6,6 +6,7 @@ import ChatsUsersApi from '../api/chats-users-api';
 import UserSearchApi from '../api/user-search';
 import { UserModel } from '../types/data';
 
+const store = new Store();
 const chatsApi = new ChatsApi();
 const chatsUsersApi = new ChatsUsersApi();
 const userSearchApi = new UserSearchApi();

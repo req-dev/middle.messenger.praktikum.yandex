@@ -11,7 +11,7 @@ import ChatsListSidebar from './components/ChatsListSidebar';
 import connect from '../../framework/connectStore';
 import AddButton from './components/AddButton';
 import AddChatModal from './components/AddChatModal';
-import store, { IAppState } from '../../framework/Store';
+import Store, { IAppState } from '../../framework/Store';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Header from './components/Header';
 import DeleteChatModal from './components/DeleteChatModal';
@@ -44,6 +44,7 @@ class ChatsPage extends Block<ChatsPageProps> {
   chatsController: ChatsController;
   dialogController: DialogController;
   userSessionController: UserSessionController;
+  store: Store;
 
   constructor(props?: ChatsPageProps) {
     super({
@@ -64,7 +65,7 @@ class ChatsPage extends Block<ChatsPageProps> {
       chatsListSidebar: new ChatsListSidebar(),
       addButton: new AddButton({
         events: {
-          click: () => store.set('chatsPage.createChatModal.visible', true)
+          click: () => this.store.set('chatsPage.createChatModal.visible', true)
         }
       }),
 
@@ -90,6 +91,7 @@ class ChatsPage extends Block<ChatsPageProps> {
       })
     });
 
+    this.store = new Store();
     this.router = new Router();
     this.chatsController = new ChatsController();
     this.dialogController = new DialogController();

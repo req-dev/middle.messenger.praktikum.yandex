@@ -1,6 +1,6 @@
 import Route from './Route';
 import Block from './Block';
-import store from './Store';
+import Store from './Store';
 
 export enum Routes {
   SignIn = '/',
@@ -16,25 +16,27 @@ const authPages = [Routes.SignIn, Routes.SignUp];
 
 class Router {
 
+  private store: Store;
   private static __instance: Router;
   private authorized: boolean;
   private routes: Route[];
   private history: History;
   private _currentRoute: Route | null;
-  private _rootQuery: string;
+  private readonly _rootQuery: string;
 
   constructor(rootQuery: string = '#app') {
     if (Router.__instance) {
       return Router.__instance;
     }
 
+    this.store = new Store();
     this.routes = [];
     this.history = window.history;
     this._currentRoute = null;
     this._rootQuery = rootQuery;
     this.authorized = false;
 
-    store.subscribe('authorized', () => {
+    this.store.subscribe('authorized', () => {
       this.authStateChanged();
     })
 
@@ -59,7 +61,7 @@ class Router {
   }
 
   start() {
-    this.authorized = store.getState().authorized;
+    this.authorized = this.store.getState().authorized;
     // rerender when pathname is updated
     window.onpopstate = event => {
       const target = event.currentTarget as Window;
@@ -100,7 +102,7 @@ class Router {
   }
 
   authStateChanged() {
-    this.authorized = store.getState().authorized;
+    this.authorized = this.store.getState().authorized;
     if (this.authorized) {
       this._rerenderAuthPages();
     }

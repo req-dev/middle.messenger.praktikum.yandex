@@ -3,7 +3,7 @@ import connect from '../../../../framework/connectStore';
 import { ChatListItemModel } from '../../../../types/data';
 import ChatItem from '../../../../components/ChatItem';
 import isEqual from '../../../../unitilies/isEqual';
-import store, { IAppState } from '../../../../framework/Store';
+import Store, { IAppState } from '../../../../framework/Store';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 import DialogController from '../../../../controllers/dialog-controller';
 import formatDate from '../../../../unitilies/formatDate';
@@ -17,7 +17,7 @@ interface ChatsListSidebarProps extends blockProps {
 
 class ChatsListSidebar extends Block<ChatsListSidebarProps> {
   dialogController: DialogController;
-  scroll: number = 0;
+  store: Store;
 
   constructor(props?: ChatsListSidebarProps) {
     super({
@@ -33,13 +33,14 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
       }
     });
 
+    this.store = new Store();
     this.dialogController = new DialogController();
   }
 
   componentDidUpdate(oldProps: ChatsListSidebarProps): boolean {
     const chatList = this.props.chatList ?? [];
     const chatListChanged = !isEqual(oldProps.chatList ?? [], chatList);
-    const myUserId = store.getState().user?.id;
+    const myUserId = this.store.getState().user?.id;
 
     if (Boolean(this.props.chatList) != this.props.gotChats) {
       this.setProps({ gotChats: Boolean(this.props.chatList) });
@@ -79,7 +80,7 @@ class ChatsListSidebar extends Block<ChatsListSidebarProps> {
     const chatList = this.props.chatList ?? [];
     const chat = chatList.find(el => el.id === id);
 
-    store.set('chatsPage', {
+    this.store.set('chatsPage', {
       selectedChat: id,
       header: {
         avatar: chat?.avatar ?? null,

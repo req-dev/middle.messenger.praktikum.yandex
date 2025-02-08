@@ -10,6 +10,7 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
+    "types": ["jest", "node"],
     "baseUrl": "./src",
     "paths": {
       "@/*": [

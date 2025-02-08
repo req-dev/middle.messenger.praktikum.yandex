@@ -1,8 +1,9 @@
 import LoginApi, { LoginFormModel } from '../api/login-api';
-import store from '../framework/Store';
+import Store from '../framework/Store';
 import Router, { Routes } from '../framework/Router';
 import UserSessionController from './user-session-controller';
 
+const store = new Store();
 const loginApi = new LoginApi();
 const router = new Router();
 const userAuthController = new UserSessionController();

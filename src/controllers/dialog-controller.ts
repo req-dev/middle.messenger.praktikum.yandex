@@ -1,9 +1,10 @@
-import store from '../framework/Store';
+import Store from '../framework/Store';
 import Router, { Routes } from '../framework/Router';
 import ChatTokenApi from '../api/chat-token-api';
 
 type ServerWSResponse = { type: string } & Record<string, unknown>
 
+const store = new Store();
 const chatTokenApi = new ChatTokenApi();
 const router = new Router();
 
