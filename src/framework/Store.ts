@@ -11,6 +11,8 @@ export enum StoreEvents {
 }
 
 export interface IAppState {
+  testValue: boolean,
+  testValue2: boolean,
   authorized: boolean,
   signinPage: { FormStateData?: IFormStateData },
   signupPage: { FormStateData?: IFormStateData },
@@ -50,6 +52,8 @@ export interface IAppState {
 }
 
 const initialState: IAppState = {
+  testValue: false,
+  testValue2: false,
   authorized: localStorage.getItem('authorized') === 'true',
   signinPage: { FormStateData: { disabled: false } },
   signupPage: { FormStateData: { disabled: false } },
@@ -95,27 +99,27 @@ const initialState: IAppState = {
 class Store {
   private state: IAppState;
   private eventBus: EventBus;
+  private subscribed: boolean;
 
   constructor() {
     this.state = initialState;
     this.eventBus = new EventBus();
-  }
-
-  public onUpdate(callback: (...args: unknown[]) => void) {
-    this.eventBus.on(StoreEvents.Updated, callback);
+    this.subscribed = false;
   }
 
   public subscribe(path: string, callback: (currentState: unknown) => void) {
-    let stateCache = get(this.getState() as unknown as Record<string, unknown>, path);
+    // if the path is an empty string subscribes to the whole state
+    let stateCache = path ? get(this.getState() as unknown as Record<string, unknown>, path) : this.getState();
 
     this.eventBus.on(StoreEvents.Updated, () => {
-      const currentState = get(this.getState() as unknown as Record<string, unknown>, path);
+      const currentState = path ? get(this.getState() as unknown as Record<string, unknown>, path) : this.getState();
 
       if(!isEqual(stateCache, currentState)) {
         stateCache = currentState;
         callback(currentState);
       }
     });
+    this.subscribed = true;
   }
 
   public getState() {
@@ -129,7 +133,9 @@ class Store {
       localStorage.setItem('authorized', (value as boolean).toString()); // cache auth status
     }
 
-    this.eventBus.emit(StoreEvents.Updated);
+    if (this.subscribed) {
+      this.eventBus.emit(StoreEvents.Updated);
+    }
   }
 }
 

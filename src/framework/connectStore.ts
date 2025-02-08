@@ -11,8 +11,7 @@ function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAp
 
         super({...props, ...state} as P);
 
-        // rewrite to subscribe
-        store.onUpdate(() => {
+        store.subscribe('', () => {
           const newState = mapStateToProps(store.getState()) ?? {};
 
           if (!isEqual(state, newState)) {
