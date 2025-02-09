@@ -98,9 +98,9 @@ const initialState: IAppState = {
 
 class Store {
   private static __instance: Store;
-  private state: IAppState;
-  private eventBus: EventBus;
-  private subscribed: boolean;
+  protected state: IAppState;
+  protected eventBus: EventBus;
+  protected subscribed: boolean;
 
   constructor() {
     if (Store.__instance) {

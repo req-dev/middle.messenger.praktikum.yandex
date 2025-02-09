@@ -36,10 +36,6 @@ class Router {
     this._rootQuery = rootQuery;
     this.authorized = false;
 
-    this.store.subscribe('authorized', () => {
-      this.authStateChanged();
-    })
-
     Router.__instance = this;
   }
 
@@ -62,16 +58,20 @@ class Router {
 
   start() {
     this.authorized = this.store.getState().authorized;
+    this.store.subscribe('authorized', () => {
+      this.authStateChanged();
+    });
+
     // rerender when pathname is updated
-    window.onpopstate = event => {
+    window.addEventListener('popstate', (event) => {
       const target = event.currentTarget as Window;
       this._onRoute(target.location.pathname);
-    };
+    });
 
     this.go(window.location.pathname);
   }
 
-  _onRoute(pathname: string) {
+  private _onRoute(pathname: string) {
     let route = this.getRoute(pathname);
     if (!route) {
       route = this.getRoute(Routes.Error404)!;
