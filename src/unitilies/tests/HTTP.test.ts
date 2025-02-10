@@ -77,7 +77,7 @@ describe('HTTPTransport', () => {
     try {
       await http.requestWithRetry('/messages', { tries: 3, timeout: 5 });
     } catch (err) {
-
+      void err;
     }
 
     expect(retryFunc).toBeCalledTimes(3);

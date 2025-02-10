@@ -1,6 +1,5 @@
 /build
 **/*.min.js
-**/*.test.ts
 /node_modules
 /dist
 vite.config.ts

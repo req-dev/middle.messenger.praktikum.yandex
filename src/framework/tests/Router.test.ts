@@ -2,7 +2,7 @@ import Router, { Routes } from '../Router';
 
 // Mock the Store class
 jest.mock('../Store', () => {
-  let instance: any;
+  let instance: Store;
   return {
     default: jest.fn().mockImplementation(() => {
       if (instance) {
@@ -22,7 +22,7 @@ jest.mock('../Store', () => {
           callback = cb;
         }),
         getState: jest.fn(() => state),
-      };
+      } as unknown as Store;
 
       return instance;
     }),
@@ -63,10 +63,6 @@ describe('Router', () => {
 
   beforeEach(() => {
     jest.resetModules();
-
-    // Clear the singleton instances
-    (Store as any).__instance = null;
-    (Router as any).__instance = null;
 
     document.body.innerHTML = '<body><main id="app"></main></body>';
     router = new Router();
