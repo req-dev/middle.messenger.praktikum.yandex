@@ -22,7 +22,8 @@
     "lint:fix": "eslint . --fix",
     "lint:style": "stylelint \"**/*.pcss\"",
     "lint:style:fix": "stylelint \"**/*.pcss\" --fix",
-    "lint:all": "npm-run-all lint lint:style"
+    "lint:all": "npm-run-all lint lint:style",
+    "prepare": "husky"
   },
   "husky": {
     "hooks": {
