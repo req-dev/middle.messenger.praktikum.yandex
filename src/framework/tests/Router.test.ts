@@ -72,6 +72,12 @@ describe('Router', () => {
     router = new Router();
   });
 
+  it('should be only one instance (singleton)', () => {
+    const secondRouter = new Router();
+
+    expect(router).toStrictEqual(secondRouter);
+  });
+
   it('Should stay be at the auth page', () => {
     router
       .use(Routes.SignIn, FakeBlock)

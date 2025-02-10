@@ -9,9 +9,7 @@ class Component extends Block {
     });
   }
 
-  componentDidMount() {
-
-  }
+  componentDidMount() { }
 
   render() {
     return `<div>{{text}}</div>`;
@@ -53,10 +51,10 @@ describe('Block', () => {
 
   it('should call dispatchComponentDidMount on child when dispatchComponentDidMount is called on the parent block', () => {
     const childComponent = new Component();
-    component = new Component({ childComponent });
+    const parent = new Component({ childComponent });
     const childComponentDidMount = jest.spyOn(childComponent, 'componentDidMount');
 
-    component.dispatchComponentDidMount();
+    parent.dispatchComponentDidMount();
 
     expect(childComponentDidMount).toBeCalled();
   });

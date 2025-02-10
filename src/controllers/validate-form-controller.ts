@@ -23,9 +23,9 @@ class ValidateFormController {
 
   private _clearErrors() {
     this.inputsErrors = {};
-    this.dataCascade.forEach((name) => {
+    for (const name of this.dataCascade) {
       this.inputsErrors[name] = '';
-    });
+    }
     this.errorsCount = 0;
   }
 
