@@ -65,7 +65,13 @@ class Router {
     // rerender when pathname is updated
     window.addEventListener('popstate', (event) => {
       const target = event.currentTarget as Window;
-      this._onRoute(target.location.pathname);
+      const { pathname, redirectForbidden } = this._checkPath(target.location.pathname);
+
+      if (redirectForbidden) {
+        this.go(pathname);
+      } else {
+        this._onRoute(pathname);
+      }
     });
 
     this.go(window.location.pathname);
@@ -87,14 +93,10 @@ class Router {
 
   go(pathname: string) {
     // forbid redirect if an unauthorized user tries to go anywhere but allowed pages
-    const pathEnum = this.getRouteEnumByLink(pathname) ?? Routes.Error404;
-    const redirectForbidden = this.authorized ? authPages.includes(pathEnum) : pagesRequireAuth.includes(pathEnum);
-    if (redirectForbidden) {
-      pathname = this.authorized ? Routes.Messenger : Routes.SignIn;
-    }
+    const checkedPathname = this._checkPath(pathname).pathname;
 
-    this.history.pushState({}, "", pathname);
-    this._onRoute(pathname);
+    this.history.pushState({}, "", checkedPathname);
+    this._onRoute(checkedPathname);
   }
 
   getRoute(pathname: string) {
@@ -107,6 +109,16 @@ class Router {
       this._rerenderAuthPages();
     }
     this.go(this.authorized ? Routes.Messenger : Routes.SignIn);
+  }
+
+  private _checkPath(pathname: string) {
+    // forbids redirect if an unauthorized user tries to go anywhere but allowed pages
+    const pathEnum = this.getRouteEnumByLink(pathname) ?? Routes.Error404;
+    const redirectForbidden = this.authorized ? authPages.includes(pathEnum) : pagesRequireAuth.includes(pathEnum);
+    if (redirectForbidden) {
+      pathname = this.authorized ? Routes.Messenger : Routes.SignIn;
+    }
+    return { pathname, redirectForbidden };
   }
 
   private _rerenderAuthPages() {
