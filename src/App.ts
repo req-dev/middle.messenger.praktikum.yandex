@@ -1,6 +1,6 @@
 import * as Pages from './pages';
 import '../global.pcss';
-import Router from './framework/Router';
+import Router, { Routes } from './framework/Router';
 
 export default class App {
   private _rootQuery: string;
@@ -12,12 +12,12 @@ export default class App {
     const router = new Router(this._rootQuery);
 
     router
-      .use('/', Pages.SignInPage)
-      .use('/sign-up', Pages.SignUpPage)
-      .use('/messenger', Pages.ChatsPage)
-      .use('/settings', Pages.ProfilePage)
-      .use('/404', Pages.Error404)
-      .use('/500', Pages.Error500)
+      .use(Routes.SignIn, Pages.SignInPage)
+      .use(Routes.SignUp, Pages.SignUpPage)
+      .use(Routes.Messenger, Pages.ChatsPage)
+      .use(Routes.Settings, Pages.ProfilePage)
+      .use(Routes.Error404, Pages.Error404)
+      .use(Routes.Error500, Pages.Error500)
       .start();
   }
 }

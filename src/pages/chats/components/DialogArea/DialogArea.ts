@@ -1,5 +1,5 @@
 import Block, { blockProps } from '../../../../framework/Block';
-import store, { IAppState } from '../../../../framework/Store';
+import Store, { IAppState } from '../../../../framework/Store';
 import connect from '../../../../framework/connectStore';
 import { MessageModel } from '../../../../types/data';
 import DialogMessage from './Components';
@@ -12,6 +12,9 @@ interface DialogAreaProps extends blockProps {
 }
 
 class DialogArea extends Block<DialogAreaProps> {
+
+  store: Store;
+
   constructor(props?: DialogAreaProps) {
     super({
       ...props,
@@ -20,12 +23,13 @@ class DialogArea extends Block<DialogAreaProps> {
         messagesComponents: []
       }
     });
+    this.store = new Store();
   }
 
   componentDidUpdate(oldProps: DialogAreaProps): boolean {
     const messagesData = this.props.messages ?? [];
     const messagesDataChanged = !isEqual(oldProps.messages ?? [], messagesData);
-    const myUserId = store.getState().user?.id;
+    const myUserId = this.store.getState().user?.id;
 
     if (messagesDataChanged) {
       // updates components from the received list

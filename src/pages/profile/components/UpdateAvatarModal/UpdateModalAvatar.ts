@@ -80,6 +80,6 @@ class UpdateModalAvatar extends Modal<UpdateModalAvatarProps> {
 
 }
 
-const mapStateToProps = (state: IAppState) => state.profilePage.updateAvatarModal as unknown as Record<string, unknown>;
+const mapStateToProps = (state: IAppState) => state.profilePage.updateAvatarModal;
 
 export default connect(mapStateToProps)(UpdateModalAvatar);

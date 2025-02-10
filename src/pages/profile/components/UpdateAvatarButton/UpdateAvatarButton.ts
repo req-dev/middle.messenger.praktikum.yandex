@@ -38,6 +38,6 @@ class UpdateAvatarButton extends Block<UpdateAvatarButtonProps> {
   }
 }
 
-const mapStateToProps = (state: IAppState) => state.profilePage.userData as unknown as Record<string, unknown>;
+const mapStateToProps = (state: IAppState) => state.profilePage.userData;
 
 export default connect(mapStateToProps)(UpdateAvatarButton);

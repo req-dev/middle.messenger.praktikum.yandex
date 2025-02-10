@@ -83,6 +83,6 @@ class AddChatModal extends Modal<AddChatModalProps> {
 
 }
 
-const mapStateToProps = (state: IAppState) => state.chatsPage.createChatModal as unknown as Record<string, unknown>;
+const mapStateToProps = (state: IAppState) => state.chatsPage.createChatModal;
 
 export default connect(mapStateToProps)(AddChatModal);

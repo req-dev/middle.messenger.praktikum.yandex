@@ -11,7 +11,7 @@ import isEqual from '../../unitilies/isEqual';
 import { UserModel } from '../../types/data';
 import { UpdatePasswordRequest } from '../../api/password-api';
 import { UpdateProfileRequest } from '../../api/profile-api';
-import store, { IAppState } from '../../framework/Store';
+import Store, { IAppState } from '../../framework/Store';
 import UpdateModalAvatar from './components/UpdateAvatarModal';
 import UpdateAvatarButton from './components/UpdateAvatarButton';
 import ModalMessage from '../../components/ModalMessage';
@@ -40,6 +40,7 @@ interface ProfilePageProps extends blockProps {
 
 class ProfilePage extends Block<ProfilePageProps> {
 
+  store: Store;
   editProfileForm: Form;
   editPasswordForm: Form;
   saveChangesButton: Button;
@@ -56,7 +57,7 @@ class ProfilePage extends Block<ProfilePageProps> {
 
       updateAvatarButton: new UpdateAvatarButton({
         events: {
-          click: () => store.set('profilePage.updateAvatarModal.visible', true)
+          click: () => this.store.set('profilePage.updateAvatarModal.visible', true)
         }
       }),
       editProfileForm: new Form({
@@ -147,13 +148,13 @@ class ProfilePage extends Block<ProfilePageProps> {
       editButton: new TableButton({
         text: 'Edit',
         events: {
-          click: () => store.set('profilePage.editingMode', true)
+          click: () => this.store.set('profilePage.editingMode', true)
         }
       }),
       changePasswordButton: new TableButton({
         text: 'Change Password',
         events: {
-          click: () => store.set('profilePage', {
+          click: () => this.store.set('profilePage', {
             editingMode: true,
             editingPasswordMode: true
           })
@@ -187,6 +188,7 @@ class ProfilePage extends Block<ProfilePageProps> {
       })
     });
 
+    this.store = new Store();
     this.userAccountController = new UserAccountController();
     this.userSessionController = new UserSessionController();
     this.userSessionController.getUser();
@@ -247,7 +249,7 @@ class ProfilePage extends Block<ProfilePageProps> {
     this.editProfileForm.clear();
     this.editPasswordForm.clear();
     this.fillProfileFormWithUser();
-    store.set('profilePage', {
+    this.store.set('profilePage', {
       editingMode: false,
       editingPasswordMode: false
     });
@@ -323,6 +325,6 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 }
 
-const mapStateToProps = (state: IAppState) => state.profilePage as unknown as Partial<ProfilePageProps>;
+const mapStateToProps = (state: IAppState) => state.profilePage;
 
 export default connect<ProfilePageProps>(mapStateToProps)(ProfilePage);

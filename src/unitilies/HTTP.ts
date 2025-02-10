@@ -20,35 +20,36 @@ class HTTP {
     return this.request(url, {
       ...options,
       method: 'GET'
-    }, options?.timeout);
+    });
   };
 
   post = <T>(url: string, options: IHTTPOptions<T> = {}) => {
     return this.request(url, {
       ...options,
       method: 'POST'
-    }, options?.timeout);
+    });
   };
 
   put = <T>(url: string, options: IHTTPOptions<T> = {}) => {
     return this.request(url, {
       ...options,
       method: 'PUT'
-    }, options?.timeout);
+    });
   };
 
   delete = <T>(url: string, options: IHTTPOptions<T> = {}) => {
     return this.request(url, {
       ...options,
       method: 'DELETE'
-    }, options?.timeout);
+    });
   };
 
-  request = <T>(url: string, options: IHTTPOptions<T> = {}, timeout = 5000): Promise<XMLHttpRequest> => {
+  request = <T>(url: string, options: IHTTPOptions<T> = {}): Promise<XMLHttpRequest> => {
     const {
       method = 'GET',
       data,
-      headers
+      headers,
+      timeout = 5000
     } = options;
     const isGet = method === 'GET';
 

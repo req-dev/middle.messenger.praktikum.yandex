@@ -52,6 +52,6 @@ class DeleteChatModal extends Modal<DeleteChatModalProps> {
 
 }
 
-const mapStateToProps = (state: IAppState) => state.chatsPage.deleteChatModal as unknown as Record<string, unknown>;
+const mapStateToProps = (state: IAppState) => state.chatsPage.deleteChatModal;
 
 export default connect(mapStateToProps)(DeleteChatModal);

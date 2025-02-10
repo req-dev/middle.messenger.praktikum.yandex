@@ -4,7 +4,7 @@ import connect from '../../../../framework/connectStore';
 import ChatOptionsButton from './components/ChatOptionsButton';
 import Submenu from '../../../../components/Submenu';
 import SubmenuButton from '../../../../components/SubmenuButton';
-import store, { IAppState } from '../../../../framework/Store';
+import Store, { IAppState } from '../../../../framework/Store';
 
 interface HeaderProps extends blockProps {
   avatar?: string | null,
@@ -13,7 +13,10 @@ interface HeaderProps extends blockProps {
 }
 
 class Header extends Block<HeaderProps> {
+
+  store: Store;
   submenu: Submenu;
+
   constructor() {
     super({
       avatar: null,
@@ -30,7 +33,7 @@ class Header extends Block<HeaderProps> {
               events: {
                 click: () => {
                   this.submenu.close();
-                  store.set('chatsPage.addUserModal.visible', true);
+                  this.store.set('chatsPage.addUserModal.visible', true);
                 }
               }
             }),
@@ -40,7 +43,7 @@ class Header extends Block<HeaderProps> {
               events: {
                 click: () => {
                   this.submenu.close();
-                  store.set('chatsPage.deleteUserModal.visible', true);
+                  this.store.set('chatsPage.deleteUserModal.visible', true);
                 }
               }
             }),
@@ -50,7 +53,7 @@ class Header extends Block<HeaderProps> {
               events: {
                 click: () => {
                   this.submenu.close();
-                  store.set('chatsPage.deleteChatModal.visible', true);
+                  this.store.set('chatsPage.deleteChatModal.visible', true);
                 }
               }
             }),
@@ -63,6 +66,7 @@ class Header extends Block<HeaderProps> {
         }
       }),
     }, 'header');
+    this.store = new Store();
   }
 
   componentDidMount() {

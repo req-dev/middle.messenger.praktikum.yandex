@@ -1,4 +1,4 @@
-import store from '../framework/Store';
+import Store from '../framework/Store';
 
 interface IValidateFormResult{
   isCorrect: boolean,
@@ -7,12 +7,14 @@ interface IValidateFormResult{
 }
 
 class ValidateFormController {
+  private store: Store;
   private dataCascade: string[] = [];
   private inputsErrors: Record<string, string> = {};
   private errorsCount: number = 0;
   private pathToState: string;
 
   constructor(pathToState = '') {
+    this.store = new Store();
     this.pathToState = pathToState;
     this.inputsErrors = {};
     this.dataCascade = [];
@@ -21,9 +23,9 @@ class ValidateFormController {
 
   private _clearErrors() {
     this.inputsErrors = {};
-    this.dataCascade.forEach((name) => {
+    for (const name of this.dataCascade) {
       this.inputsErrors[name] = '';
-    });
+    }
     this.errorsCount = 0;
   }
 
@@ -136,7 +138,7 @@ class ValidateFormController {
   }
 
   private applyErrorMessages = () => {
-    store.set(`${this.pathToState}.formErrors`, this.inputsErrors);
+    this.store.set(`${this.pathToState}.formErrors`, this.inputsErrors);
   }
 }
 

@@ -1,6 +1,6 @@
 import Block, { blockProps } from '../../framework/Block';
 import ButtonS from '../../components/ButtonS';
-import Router from '../../framework/Router';
+import Router, { Routes } from '../../framework/Router';
 
 interface ErrorPageProps extends blockProps{
   code: string,
@@ -19,7 +19,7 @@ export default class ErrorPage extends Block<ErrorPageProps> {
       ButtonS: new ButtonS({
         text: 'Back to Chats',
         events: {
-          click: () => this.router.go('/messenger')
+          click: () => this.router.go(Routes.Messenger)
         }
       })
     });

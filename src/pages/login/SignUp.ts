@@ -7,7 +7,7 @@ import { SignupFormModel } from '../../api/signup-api';
 import UserSignupController from '../../controllers/user-signup-controller';
 
 import connect from '../../framework/connectStore';
-import Router from '../../framework/Router';
+import Router, { Routes } from '../../framework/Router';
 import ModalMessage from '../../components/ModalMessage';
 import { IAppState } from '../../framework/Store';
 import UserSessionController from '../../controllers/user-session-controller';
@@ -107,7 +107,7 @@ class SignUpPage extends Block<SignUpProps> {
         darkMode: true,
         attr: { id: 'signinBtn' },
         events: {
-          click: () => this.router.go('/')
+          click: () => this.router.go(Routes.SignIn)
         }
       })
     });
