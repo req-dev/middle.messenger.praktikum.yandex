@@ -128,11 +128,42 @@ describe('Router', () => {
     store.set('authorized', true);
     router
       .use(Routes.SignIn, FakeBlock)
-      .use(Routes.Messenger, FakeBlock)
+      .use(Routes.Messenger, FakeBlock);
 
     router.start();
 
     expect(window.location.pathname).toBe('/messenger');
+  });
+
+  it('Should redirect to the messenger page after state changed', () => {
+    const store = new Store();
+    router
+      .use(Routes.SignIn, FakeBlock)
+      .use(Routes.Messenger, FakeBlock)
+      .start();
+
+    store.set('authorized', true);
+
+    expect(window.location.pathname).toBe('/messenger');
+  });
+
+  it('Should stay at the messenger page after auth state changed and back button pressed', () => {
+    const store = new Store();
+    router
+      .use(Routes.SignIn, FakeBlock)
+      .use(Routes.SignUp, FakeBlock)
+      .use(Routes.Messenger, FakeBlock)
+      .start();
+    router.go(Routes.SignUp);
+    router.go(Routes.SignIn);
+    router.go(Routes.SignUp);
+
+    store.set('authorized', true);
+    window.history.back();
+    window.history.back();
+
+    expect(window.location.pathname).not.toBe('/');
+    expect(window.location.pathname).not.toBe('/sign-up');
   });
 
 });
