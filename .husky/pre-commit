@@ -1,1 +1,2 @@
-npm test
+#!/bin/sh
+npm-run-all test lint:all
