@@ -1,40 +1,55 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/46ae13a3-e441-4655-8046-059d65facb24/deploy-status)](https://app.netlify.com/sites/yp-messr/deploys)
-# Веб приложение "Чат"
+# Web application "Chat"
 
-"Чат" это быстрое и оптимизированное SPA-приложение для общения с друзьями:
+"Chat" is a fast and optimized SPA with cool dark design for communicating with friends:
 
-- Отправка текстовых сообщений
-- Поддержка отправки фотографий, видео, ссылок
-- Возможность создавать груповые чаты с неограниченным количеством собеседников
-- Отптимизированная и быстрая работа
+General features:
+- Send text messages
+- Send photos, videos, links
+- Create group chats with an unlimited number of friends
+- Optimized and fast work
+- Cool dark design
 
-## Макет приложения
+## Application Layout Drafts
 
-[Ссылка на Figma](https://www.figma.com/design/j2L3BRdydTCntvA4G7EjRI/middle.messenger.praktikum.yandex?node-id=0-1&t=XmE2OGrPSeJjJmmk-1)
+[Go to Figma](https://www.figma.com/design/j2L3BRdydTCntvA4G7EjRI/middle.messenger.praktikum.yandex?node-id=0-1&t=XmE2OGrPSeJjJmmk-1)
 
-## Описание
+## Description
 
-Общение с друзьями, коллегами, знакомство с новыми людьми - все это позволяет вам сделать "Чат". Вы можете создавать группы с неограниченным количеством участников! **Ограничений на темы обсуждения нет**. Мы не модерируем и не цензурируем чаты (потому что у нас нет на это денег)
+Chat with friends, colleagues, meet new people — you can do all of it in "Chat."
+You can create groups with an unlimited number of participants!
+There are no restrictions on topics of discussion.
+**We don't moderate or censor chats** (because we don't have money for that).
+Feel free to talk about anything and enjoy the cool dark design of the app!
 
-[Ссылка на Netlify](https://yp-messr.netlify.app/chats)
+[Go to Netlify](https://yp-messr.netlify.app/chats)
 
-### Страницы приложения
+### Pages
 
 * [/](https://yp-messr.netlify.app/)
 * [/sign-up](https://yp-messr.netlify.app/sign-up)
 * [/messenger](https://yp-messr.netlify.app/messenger)
 * [/settings](https://yp-messr.netlify.app/settings)
 
-### Команды
+### Scripts
 
-- `npm run start` — сборка и запуск проекта на localhost:3000
-- `npm run lint` — запуск ESLint
-- `npm run lint:style` — запуск StyleLint
+- `npm run start` — builds and run the project on localhost:3000
+- `npm run lint:all` — run all Linters
+- `npm run lint` — run ESLint
+- `npm run lint:style` — run StyleLint
+- `npm run test` — run Jest tests
 
-### Использованные технологии
+The project is automated.
+All tests and linters will run before each commit to make sure you can't accidentally commit bugged code.
+
+### Technologies and libraries used
 
 * [Handlebars](https://handlebarsjs.com/guide/#what-is-handlebars)
 * [Vite](https://vite.dev/)
 * [PostCSS](https://postcss.org/)
 * [ESLint](https://eslint.org/)
 * [StyleLint](https://stylelint.io/)
+* [Jest](https://jestjs.io/)
+* [Husky](https://typicode.github.io/husky/)
+
+Special thanks to [Yandex.practicum](https://practicum.yandex.ru/) for their assistance and help.

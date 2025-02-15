@@ -1,11 +1,12 @@
-import store from '../framework/Store';
-import Router from '../framework/Router';
+import Store from '../framework/Store';
+import Router, { Routes } from '../framework/Router';
 import ChatsApi, { GetChatsRequest, DeleteChatRequest, CreateChatRequest } from '../api/chats-api';
 import DialogController from './dialog-controller';
 import ChatsUsersApi from '../api/chats-users-api';
 import UserSearchApi from '../api/user-search';
 import { UserModel } from '../types/data';
 
+const store = new Store();
 const chatsApi = new ChatsApi();
 const chatsUsersApi = new ChatsUsersApi();
 const userSearchApi = new UserSearchApi();
@@ -41,7 +42,7 @@ class ChatsController {
           store.set('authorized', false);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           console.log(result.response);
@@ -81,7 +82,7 @@ class ChatsController {
           store.set('chatsPage.createChatModal.formData.generalFormError', result.response.reason);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           success = true;
@@ -127,7 +128,7 @@ class ChatsController {
           store.set('authorized', false);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 400:
         case 403:
@@ -207,7 +208,7 @@ class ChatsController {
           store.set('chatsPage.addUserModal.formData.generalFormError', result.response.reason);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           success = true;
@@ -268,7 +269,7 @@ class ChatsController {
           store.set('chatsPage.deleteUserModal.formData.generalFormError', result.response.reason);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           success = true;
@@ -299,7 +300,7 @@ class ChatsController {
         store.set('authorized', false);
         break;
       case 500:
-        router.go('/500');
+        router.go(Routes.Error500);
         break;
       case 200:
         result = request.response as UserModel[];

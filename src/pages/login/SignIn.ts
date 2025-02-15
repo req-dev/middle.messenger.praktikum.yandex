@@ -4,7 +4,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import Form, { IFormStateData } from '../../components/Form';
 import connect from '../../framework/connectStore';
-import Router from '../../framework/Router';
+import Router, { Routes } from '../../framework/Router';
 import UserLoginController from '../../controllers/user-login-controller';
 import { LoginFormModel } from '../../api/login-api';
 import ModalMessage from '../../components/ModalMessage';
@@ -72,7 +72,7 @@ class SignInPage extends Block<SignInProps> {
         darkMode: true,
         attr: { id: 'signupBtn' },
         events: {
-          click: () => this.router.go('/sign-up')
+          click: () => this.router.go(Routes.SignUp)
         }
       })
     });

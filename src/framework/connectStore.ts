@@ -1,8 +1,10 @@
 import Block, { blockProps } from './Block';
-import store, { IAppState } from './Store';
+import Store, { IAppState } from './Store';
 import isEqual from '../unitilies/isEqual';
 
-function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAppState) => Partial<P> | undefined) {
+const store = new Store();
+
+function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAppState) => unknown) {
   return function(Component: typeof Block<P>) {
     return class extends Component {
       constructor(...args: P[]) {
@@ -11,8 +13,7 @@ function connect<P extends blockProps = blockProps>(mapStateToProps: (state: IAp
 
         super({...props, ...state} as P);
 
-        // rewrite to subscribe
-        store.onUpdate(() => {
+        store.subscribe('', () => {
           const newState = mapStateToProps(store.getState()) ?? {};
 
           if (!isEqual(state, newState)) {

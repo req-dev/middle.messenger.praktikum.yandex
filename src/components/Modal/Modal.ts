@@ -1,7 +1,7 @@
 import './Modal.pcss';
 import Block, { blockProps } from '../../framework/Block';
 import Button from '../Button';
-import store from '../../framework/Store';
+import Store from '../../framework/Store';
 import { IFormStateData } from '../Form';
 
 // for using in Store
@@ -25,6 +25,7 @@ export interface ModalProps extends blockProps {
 export class Modal<T extends ModalProps = ModalProps> extends Block<T> {
 
   cancelButton: Button;
+  private store: Store;
 
   constructor(props: T) {
     super({
@@ -44,6 +45,7 @@ export class Modal<T extends ModalProps = ModalProps> extends Block<T> {
         click: () => this.closeBkgClicked()
       }
     });
+    this.store = new Store();
   }
 
   private modalClicked(e: Event) {
@@ -70,7 +72,7 @@ export class Modal<T extends ModalProps = ModalProps> extends Block<T> {
 
     const { statePath } = this.props;
     if (statePath) {
-      store.set(statePath, { visible: true });
+      this.store.set(statePath, { visible: true });
     } else {
       this.setProps({ visible: true });
     }
@@ -83,7 +85,7 @@ export class Modal<T extends ModalProps = ModalProps> extends Block<T> {
 
     const { statePath } = this.props;
     if (statePath) {
-      store.set(statePath, { visible: false });
+      this.store.set(statePath, { visible: false });
     } else {
       this.setProps({ visible: false });
     }

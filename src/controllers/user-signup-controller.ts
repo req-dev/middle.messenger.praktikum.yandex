@@ -1,8 +1,10 @@
 import SignupApi, { SignupFormModel } from '../api/signup-api';
-import store from '../framework/Store';
-import Router from '../framework/Router';
+import Store from '../framework/Store';
+import Router, { Routes } from '../framework/Router';
 import UserSessionController from './user-session-controller';
 
+
+const store = new Store();
 const signupApi = new SignupApi();
 const router = new Router();
 const userAuthController = new UserSessionController();
@@ -34,7 +36,7 @@ class UserSignupController {
           store.set('signupPage.FormStateData.generalFormError', 'Conflict: User is already registered.');
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           store.set('globalModalMessage', {

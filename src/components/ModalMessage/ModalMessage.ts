@@ -25,6 +25,6 @@ class ModalMessage extends Modal {
 
 }
 
-const mapStateToProps = (state: IAppState) => state.globalModalMessage as unknown as Partial<ModalProps>;
+const mapStateToProps = (state: IAppState) => state.globalModalMessage;
 
 export default connect<ModalProps>(mapStateToProps)(ModalMessage);

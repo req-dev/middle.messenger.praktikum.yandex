@@ -1,10 +1,11 @@
 import ProfileApi, { UpdateProfileRequest } from '../api/profile-api';
 import PasswordApi, { UpdatePasswordRequest } from '../api/password-api';
-import store from '../framework/Store';
-import Router from '../framework/Router';
+import Store from '../framework/Store';
+import Router, { Routes } from '../framework/Router';
 import { UserModel } from '../types/data';
 import AvatarApi from '../api/avatar-api';
 
+const store = new Store();
 const profileApi = new ProfileApi();
 const passwordApi = new PasswordApi();
 const avatarApi = new AvatarApi();
@@ -39,7 +40,7 @@ class UserAccountController {
           store.set('profilePage.editProfileFormData.generalFormError', result.response.reason);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           store.set('profilePage.userData', result.response as UserModel);
@@ -88,7 +89,7 @@ class UserAccountController {
           willExitEditingMode = false;
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           store.set('globalModalMessage', {
@@ -139,7 +140,7 @@ class UserAccountController {
           store.set('profilePage.updateAvatarModal.formData.generalFormError', result.response.reason);
           break;
         case 500:
-          router.go('/500');
+          router.go(Routes.Error500);
           break;
         case 200:
           store.set('profilePage.userData', result.response as UserModel);

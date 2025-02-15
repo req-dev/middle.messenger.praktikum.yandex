@@ -3,7 +3,7 @@ import './Form.pcss';
 import Block, {blockProps} from '../../framework/Block';
 import Input from '../Input';
 import { ValidateFormController, IValidateFormResult } from '../../controllers/validate-form-controller';
-import store from '../../framework/Store';
+import Store from '../../framework/Store';
 
 export interface IFormStateData {
   formErrors?: Record<string, string>;
@@ -21,6 +21,7 @@ export type FormProps = props & IFormStateData;
 
 export default class Form extends Block<FormProps>{
   private validateFormController: ValidateFormController;
+  private store: Store;
 
   constructor(props: FormProps) {
     super({
@@ -36,6 +37,7 @@ export default class Form extends Block<FormProps>{
     this.validateFormController = new ValidateFormController(
       props.statePath
     );
+    this.store = new Store();
   }
 
   componentDidMount() {
@@ -75,7 +77,7 @@ export default class Form extends Block<FormProps>{
       input.setValue('');
     }
 
-    store.set(`${this.props.statePath}`, {
+    this.store.set(`${this.props.statePath}`, {
       generalFormError: ''
     });
     this.validateFormController.clearErrors();

@@ -1,35 +1,51 @@
 import Route from './Route';
 import Block from './Block';
-import store from './Store';
+import Store from './Store';
 
-const pagesRequireAuth = ['/messenger', '/settings'];
-const authPages = ['/', '/sign-up'];
+export enum Routes {
+  SignIn = '/',
+  SignUp = '/sign-up',
+  Messenger = '/messenger',
+  Settings = '/settings',
+  Error404 = '/404',
+  Error500 = '/500',
+}
+
+const pagesRequireAuth = [Routes.Messenger, Routes.Settings];
+const authPages = [Routes.SignIn, Routes.SignUp];
 
 class Router {
 
+  private store: Store;
   private static __instance: Router;
   private authorized: boolean;
   private routes: Route[];
   private history: History;
   private _currentRoute: Route | null;
-  private _rootQuery: string;
+  private readonly _rootQuery: string;
 
   constructor(rootQuery: string = '#app') {
     if (Router.__instance) {
       return Router.__instance;
     }
 
+    this.store = new Store();
     this.routes = [];
     this.history = window.history;
     this._currentRoute = null;
     this._rootQuery = rootQuery;
     this.authorized = false;
 
-    store.subscribe('authorized', () => {
-      this.authStateChanged();
-    })
-
     Router.__instance = this;
+  }
+
+  private getRouteEnumByLink(pathname: string): Routes | undefined {
+    const routesMap: Record<string, Routes> = Object.entries(Routes).reduce((acc, [key, value]) => {
+      acc[value] = Routes[key as keyof typeof Routes];
+      return acc;
+    }, {} as Record<string, Routes>);
+
+    return routesMap[pathname];
   }
 
   use(pathname: string, block: new (...args: unknown[]) => Block) {
@@ -41,20 +57,30 @@ class Router {
   }
 
   start() {
-    this.authorized = store.getState().authorized;
+    this.authorized = this.store.getState().authorized;
+    this.store.subscribe('authorized', () => {
+      this.authStateChanged();
+    });
+
     // rerender when pathname is updated
-    window.onpopstate = event => {
+    window.addEventListener('popstate', (event) => {
       const target = event.currentTarget as Window;
-      this._onRoute(target.location.pathname);
-    };
+      const { pathname, redirectForbidden } = this._checkPath(target.location.pathname);
+
+      if (redirectForbidden) {
+        this.go(pathname);
+      } else {
+        this._onRoute(pathname);
+      }
+    });
 
     this.go(window.location.pathname);
   }
 
-  _onRoute(pathname: string) {
+  private _onRoute(pathname: string) {
     let route = this.getRoute(pathname);
     if (!route) {
-      route = this.getRoute('/404')!;
+      route = this.getRoute(Routes.Error404)!;
     }
 
     if (this._currentRoute) {
@@ -67,13 +93,10 @@ class Router {
 
   go(pathname: string) {
     // forbid redirect if an unauthorized user tries to go anywhere but allowed pages
-    const redirectForbidden = this.authorized ? authPages.includes(pathname) : pagesRequireAuth.includes(pathname);
-    if (redirectForbidden) {
-      pathname = this.authorized ? '/messenger' : '/';
-    }
+    const checkedPathname = this._checkPath(pathname).pathname;
 
-    this.history.pushState({}, "", pathname);
-    this._onRoute(pathname);
+    this.history.pushState({}, "", checkedPathname);
+    this._onRoute(checkedPathname);
   }
 
   getRoute(pathname: string) {
@@ -81,16 +104,26 @@ class Router {
   }
 
   authStateChanged() {
-    this.authorized = store.getState().authorized;
+    this.authorized = this.store.getState().authorized;
     if (this.authorized) {
       this._rerenderAuthPages();
     }
-    this.go(this.authorized ? '/messenger' : '/');
+    this.go(this.authorized ? Routes.Messenger : Routes.SignIn);
+  }
+
+  private _checkPath(pathname: string) {
+    // forbids redirect if an unauthorized user tries to go anywhere but allowed pages
+    const pathEnum = this.getRouteEnumByLink(pathname) ?? Routes.Error404;
+    const redirectForbidden = this.authorized ? authPages.includes(pathEnum) : pagesRequireAuth.includes(pathEnum);
+    if (redirectForbidden) {
+      pathname = this.authorized ? Routes.Messenger : Routes.SignIn;
+    }
+    return { pathname, redirectForbidden };
   }
 
   private _rerenderAuthPages() {
-    const messenger = this.getRoute('/messenger');
-    const settings = this.getRoute('/settings');
+    const messenger = this.getRoute(Routes.Messenger);
+    const settings = this.getRoute(Routes.Settings);
 
     if (messenger) {
       messenger.render(true);

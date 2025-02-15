@@ -10,6 +10,7 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
+    "types": ["jest", "node"],
     "baseUrl": "./src",
     "paths": {
       "@/*": [
@@ -20,6 +21,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
+    "jest.config.ts",
     ".eslintrc.cjs",
     ".eslintignore"
   ],

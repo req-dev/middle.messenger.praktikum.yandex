@@ -1,7 +1,7 @@
 import './Submenu.pcss';
 import Block, { blockProps } from '../../framework/Block';
 import SubmenuButton from '../SubmenuButton';
-import store from '../../framework/Store';
+import Store from '../../framework/Store';
 
 interface SubmenuProps extends blockProps {
   childrenList?: { options: SubmenuButton[] } & Record<string, Block[]>,
@@ -10,16 +10,20 @@ interface SubmenuProps extends blockProps {
 }
 
 export default class Submenu extends Block<SubmenuProps> {
+
+  private store: Store;
+
   constructor(props: SubmenuProps) {
     super({
       ...props,
       className: 'submenu',
     });
+    this.store = new Store();
   }
 
   open() {
     if (this.props.statePath) {
-      store.set(this.props.statePath, true);
+      this.store.set(this.props.statePath, true);
     } else {
       this.setProps({ opened: true });
     }
@@ -27,7 +31,7 @@ export default class Submenu extends Block<SubmenuProps> {
 
   close() {
     if (this.props.statePath) {
-      store.set(this.props.statePath, false);
+      this.store.set(this.props.statePath, false);
     } else {
       this.setProps({ opened: false });
     }
